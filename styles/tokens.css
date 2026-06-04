@@ -1,0 +1,118 @@
+/* ============================================================
+   WEEKEND BILLIARD — BRANDBOOK PORTAL
+   Design Tokens v1.0
+   ============================================================ */
+
+:root {
+  /* ── Brand Core Colors ── */
+  --color-bg-primary: #F8FAFC;
+  --color-bg-secondary: #FFFFFF;
+  --color-bg-tertiary: #F1F5F9;
+  --color-bg-card: #FFFFFF;
+  --color-bg-card-hover: #F8FAFC;
+  --color-bg-overlay: rgba(255, 255, 255, 0.85);
+
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #334155;
+  --color-text-tertiary: #475569;
+  --color-text-muted: #64748B;
+
+  --color-accent-gold: #0077B6;
+  --color-accent-gold-dim: rgba(0, 119, 182, 0.15);
+  --color-accent-gold-glow: rgba(0, 119, 182, 0.3);
+
+  --color-emerald: #0C5A30;
+  --color-emerald-bright: #10B981;
+  --color-emerald-dim: rgba(16, 185, 129, 0.12);
+
+  --color-border: rgba(15, 23, 42, 0.08);
+  --color-border-hover: rgba(15, 23, 42, 0.15);
+  --color-border-active: rgba(0, 119, 182, 0.3);
+
+  /* ── Chapter Color Index ── */
+  --ch1-brand-identity: #6366F1;    /* Indigo */
+  --ch2-visual-system: #8B5CF6;     /* Violet */
+  --ch3-logo: #D4AF37;              /* Gold */
+  --ch4-marketing: #F43F5E;         /* Rose */
+  --ch5-corporate: #3B82F6;         /* Blue */
+  --ch6-digital: #06B6D4;           /* Cyan */
+  --ch7-physical: #F59E0B;          /* Amber */
+  --ch8-resources: #10B981;         /* Emerald */
+
+  --ch1-dim: rgba(99, 102, 241, 0.12);
+  --ch2-dim: rgba(139, 92, 246, 0.12);
+  --ch3-dim: rgba(212, 175, 55, 0.12);
+  --ch4-dim: rgba(244, 63, 94, 0.12);
+  --ch5-dim: rgba(59, 130, 246, 0.12);
+  --ch6-dim: rgba(6, 182, 212, 0.12);
+  --ch7-dim: rgba(245, 158, 11, 0.12);
+  --ch8-dim: rgba(16, 185, 129, 0.12);
+
+  /* ── Typography ── */
+  --font-display: 'Clash Display', 'Outfit', sans-serif;
+  --font-heading: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --font-body: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --text-xs: 0.6875rem;     /* 11px */
+  --text-sm: 0.8125rem;     /* 13px */
+  --text-base: 0.9375rem;   /* 15px */
+  --text-md: 1rem;           /* 16px */
+  --text-lg: 1.125rem;       /* 18px */
+  --text-xl: 1.375rem;       /* 22px */
+  --text-2xl: 1.75rem;       /* 28px */
+  --text-3xl: 2.25rem;       /* 36px */
+  --text-4xl: 3rem;          /* 48px */
+  --text-5xl: 4rem;          /* 64px */
+
+  --leading-tight: 1.15;
+  --leading-snug: 1.3;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.8;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.05em;
+  --tracking-caps: 0.12em;
+
+  /* ── Spacing ── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ── Layout ── */
+  --sidebar-width: 280px;
+  --sidebar-collapsed: 60px;
+  --header-height: 64px;
+  --content-max: 1080px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ── Motion ── */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --duration-glacial: 800ms;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.25);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.35);
+  --shadow-glow-gold: 0 0 20px rgba(212,175,55,0.15);
+  --shadow-glow-chapter: 0 0 20px var(--chapter-color-dim, rgba(212,175,55,0.1));
+}

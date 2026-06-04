@@ -1,0 +1,4517 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Токенизированная архитектура брендбука</title>
+  <style>
+    :root {
+      --bg: #08090b;
+      --bg2: #101218;
+      --panel: rgba(255,255,255,.055);
+      --panel2: rgba(255,255,255,.085);
+      --line: rgba(255,255,255,.13);
+      --line2: rgba(255,255,255,.22);
+      --text: #f2f0ea;
+      --muted: rgba(242,240,234,.64);
+      --soft: rgba(242,240,234,.42);
+      --accent: #d7ff73;
+      --accent2: #8dd7ff;
+      --danger: #ff8a72;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      --radius: 24px;
+      --shadow: 0 24px 80px rgba(0,0,0,.42);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(215,255,115,.09), transparent 28rem),
+        radial-gradient(circle at 90% 18%, rgba(141,215,255,.07), transparent 36rem),
+        linear-gradient(135deg, #07080a 0%, #0b0d11 42%, #11131a 100%);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.5;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .25;
+      background-image:
+        linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 36px 36px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,.85), transparent 75%);
+      z-index: -1;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+      width: 100%;
+      padding: 0 40px 80px;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 24px;
+      align-self: start;
+      height: calc(100vh - 48px);
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(10,11,15,.66);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+      overflow: auto;
+    }
+
+    .mark {
+      display: grid;
+      place-items: center;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+      border: 1px solid var(--line2);
+      border-radius: 16px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .08em;
+      color: var(--accent);
+      background: linear-gradient(135deg, rgba(255,255,255,.11), rgba(255,255,255,.02));
+    }
+
+    .sidebar h1 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      line-height: 1.08;
+      letter-spacing: -.04em;
+    }
+
+    .sidebar .sub {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .search {
+      position: relative;
+      margin: 18px 0;
+    }
+
+    .search input {
+      width: 100%;
+      padding: 12px 12px 12px 38px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      color: var(--text);
+      background: rgba(255,255,255,.065);
+      outline: none;
+    }
+
+    .search span {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--soft);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 18px 0;
+    }
+
+    .stat {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,.045);
+    }
+
+    .stat strong {
+      display: block;
+      font-family: var(--mono);
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .stat small {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 6px;
+      margin-top: 18px;
+    }
+
+    .nav a {
+      display: grid;
+      grid-template-columns: 30px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 11px;
+      border: 1px solid transparent;
+      border-radius: 14px;
+      color: var(--muted);
+      font-size: 13px;
+      transition: .22s ease;
+    }
+
+    .nav a:hover {
+      border-color: var(--line);
+      color: var(--text);
+      background: rgba(255,255,255,.06);
+    }
+
+    .nav span {
+      font-family: var(--mono);
+      color: var(--accent);
+      font-size: 11px;
+    }
+
+    .nav em {
+      font-style: normal;
+      font-family: var(--mono);
+      color: var(--soft);
+      font-size: 11px;
+    }
+
+    .main {
+      min-width: 0;
+    }
+
+    .hero {
+      min-height: 540px;
+      display: grid;
+      align-content: end;
+      padding: 48px;
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 10px);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.105), rgba(255,255,255,.025)),
+        radial-gradient(circle at 70% 30%, rgba(215,255,115,.13), transparent 24rem);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -20% -45% -20%;
+      height: 50%;
+      background:
+        repeating-linear-gradient(112deg, rgba(255,255,255,.09) 0 1px, transparent 1px 16px);
+      transform: rotate(-1deg);
+      opacity: .45;
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 8px 12px;
+      border: 1px solid var(--line2);
+      border-radius: 999px;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 12px;
+      background: rgba(0,0,0,.22);
+    }
+
+    .hero h2 {
+      max-width: 960px;
+      margin: 0;
+      font-size: clamp(48px, 8vw, 112px);
+      line-height: .9;
+      letter-spacing: -.08em;
+      text-wrap: balance;
+    }
+
+    .hero p {
+      max-width: 780px;
+      margin: 28px 0 0;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    .intro-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr);
+      gap: 18px;
+      margin: 24px 0;
+    }
+
+    .info-panel, .format-panel, .token-panel, .particle-prompt {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.052);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 16px 60px rgba(0,0,0,.20);
+    }
+
+    .info-panel, .format-panel {
+      padding: 24px;
+    }
+
+    .info-panel h3, .format-panel h3, .token-panel h3 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      letter-spacing: -.02em;
+    }
+
+    .info-panel p, .format-panel p {
+      color: var(--muted);
+      margin: 0 0 12px;
+    }
+
+    .format-code {
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,.25);
+      font-family: var(--mono);
+      font-size: 12px;
+      color: rgba(242,240,234,.80);
+      overflow: auto;
+      white-space: pre-wrap;
+    }
+
+    .token-panel {
+      padding: 24px;
+      margin: 24px 0 34px;
+    }
+
+    .token-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .token-card {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(0,0,0,.18);
+    }
+
+    .token-name {
+      font-family: var(--mono);
+      color: var(--accent);
+      font-size: 12px;
+      word-break: break-word;
+    }
+
+    .token-desc {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .brand-section {
+      scroll-margin-top: 24px;
+      margin-top: 34px;
+    }
+
+    .section-hero {
+      position: relative;
+      min-height: 320px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 6px);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.07), rgba(255,255,255,.018)),
+        radial-gradient(circle at 84% 18%, rgba(141,215,255,.10), transparent 22rem);
+      box-shadow: 0 18px 70px rgba(0,0,0,.28);
+    }
+
+    .particle-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: .92;
+    }
+
+    .section-hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 850px;
+      padding: 34px;
+    }
+
+    .section-index {
+      font-family: var(--mono);
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: .08em;
+      margin-bottom: 34px;
+    }
+
+    .section-hero h2 {
+      margin: 0;
+      font-size: clamp(34px, 5vw, 70px);
+      line-height: .93;
+      letter-spacing: -.065em;
+      text-wrap: balance;
+    }
+
+    .section-hero p {
+      max-width: 680px;
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .section-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 24px;
+    }
+
+    .section-meta span {
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--soft);
+      font-family: var(--mono);
+      font-size: 11px;
+      background: rgba(0,0,0,.22);
+    }
+
+    .particle-prompt {
+      margin: 12px 0 18px;
+      overflow: hidden;
+    }
+
+    .particle-prompt summary {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px;
+      color: var(--muted);
+    }
+
+    .particle-prompt summary span {
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .particle-prompt pre {
+      margin: 0;
+      padding: 18px;
+      border-top: 1px solid var(--line);
+      white-space: pre-wrap;
+      color: rgba(242,240,234,.76);
+      font-family: var(--mono);
+      font-size: 12px;
+      background: rgba(0,0,0,.22);
+    }
+
+    .copy-prompt {
+      flex: none;
+      border: 1px solid var(--line2);
+      border-radius: 999px;
+      padding: 8px 10px;
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .copy-prompt:hover {
+      background: rgba(215,255,115,.12);
+      color: var(--accent);
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .page-card {
+      min-height: 410px;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
+      box-shadow: 0 16px 50px rgba(0,0,0,.18);
+      transition: transform .22s ease, border-color .22s ease, background .22s ease;
+    }
+
+    .page-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--line2);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.095), rgba(255,255,255,.03));
+    }
+
+    .page-topline {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .page-number {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent);
+    }
+
+    .origin-section {
+      max-width: 60%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--soft);
+      font-family: var(--mono);
+      font-size: 10px;
+    }
+
+    .page-card h3 {
+      margin: 0 0 18px;
+      font-size: 24px;
+      line-height: 1.05;
+      letter-spacing: -.04em;
+      text-wrap: balance;
+    }
+
+    .page-fields {
+      margin: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .page-fields div {
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .page-fields dt {
+      margin-bottom: 4px;
+      color: var(--soft);
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .page-fields dd {
+      margin: 0;
+      color: rgba(242,240,234,.82);
+      font-size: 13px;
+    }
+
+    .visual-placeholder {
+      margin-top: auto;
+      padding: 16px;
+      min-height: 120px;
+      border-radius: 20px;
+      border: 1px dashed rgba(242,240,234,.22);
+      background:
+        repeating-linear-gradient(135deg, rgba(255,255,255,.06) 0 1px, transparent 1px 11px),
+        rgba(255,255,255,.035);
+    }
+
+    .visual-kicker {
+      margin-bottom: 8px;
+      color: var(--accent2);
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .visual-placeholder p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .footer {
+      margin-top: 34px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--muted);
+      background: rgba(255,255,255,.045);
+      font-size: 13px;
+    }
+
+    .hidden-by-search {
+      display: none !important;
+    }
+
+    @media (max-width: 1180px) {
+      .layout { grid-template-columns: 1fr; width: min(100% - 28px, 980px); }
+      .sidebar { position: relative; top: 0; height: auto; }
+      .nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .intro-grid { grid-template-columns: 1fr; }
+      .token-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      .hero { min-height: 440px; padding: 28px; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .token-grid { grid-template-columns: 1fr; }
+      .nav { grid-template-columns: 1fr; }
+      .section-hero-content { padding: 24px; }
+      .particle-prompt summary { align-items: flex-start; flex-direction: column; }
+    }
+
+    @media print {
+      body { background: #fff; color: #111; }
+      body::before, .sidebar, .particle-canvas, .copy-prompt { display: none !important; }
+      .layout { display: block; width: 100%; padding: 0; }
+      .hero, .section-hero, .page-card, .token-panel, .info-panel, .format-panel, .particle-prompt {
+        background: #fff;
+        color: #111;
+        box-shadow: none;
+        border-color: #ddd;
+        break-inside: avoid;
+      }
+      .cards-grid, .token-grid { grid-template-columns: 1fr; }
+      .page-fields dd, .visual-placeholder p, .hero p, .section-hero p { color: #333; }
+    }
+  </style>
+
+<style>
+.sidebar { overscroll-behavior: contain; display: none; }
+</style>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="mark" style="background:none; border:none; padding:0;"><img src="../../logo/logo_icon.svg" style="width:100%; height:100%; object-fit:contain;"></div>
+      <div style="width:100%; height:40px; margin-bottom:16px; background:#fff; -webkit-mask: url(\'../../logo/logo_txt.svg\') no-repeat left center / contain; mask: url(\'../../logo/logo_txt.svg\') no-repeat left center / contain;"></div>
+      
+
+      <div class="search">
+        <span>⌕</span>
+        <input id="searchInput" type="search" placeholder="Поиск по страницам, токенам, визуалам">
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat"><strong id="completionStat">0%</strong><small>заполненность</small></div>
+        <div class="stat"><strong>8</strong><small>разделов</small></div>
+        
+        <div class="stat"><strong>8</strong><small>particle prompts</small></div>
+      </div>
+
+      <nav class="nav">
+        <a href="#section-intro"><span>01</span>Вводная часть</a>
+<a href="#section-constants"><span>02</span>Константы</a>
+<a href="#section-docs"><span>03</span>Документация</a>
+<a href="#section-stickers"><span>04</span>Наклейки</a>
+<a href="#section-cars"><span>05</span>Автомобили</a>
+<a href="#section-uniform"><span>06</span>Форма</a>
+<a href="#section-merch"><span>07</span>Сувениры</a>
+<a href="#section-ads"><span>08</span>Реклама / фасад</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      
+
+      <div class="intro-grid">
+        
+
+        
+      </div>
+
+      
+
+      
+    <section class="brand-section" id="section-intro" data-section="intro">
+      <div class="section-hero">
+        <iframe src="../logo_txt_rott_01.html" style="position:absolute; inset:0; width:100%; height:100%; border:none; mix-blend-mode:screen; opacity:0.4; pointer-events:none;"></iframe>
+        <div class="section-hero-content">
+          <div class="section-index">Раздел 01</div>
+          <h2>Вводная часть / разработка логотипа</h2>
+          <p>Смысл, аудит категории, первичные ассоциации, эскизы и поиск визуального направления.</p>
+          <div class="section-meta">
+            <span>стр. 001–024</span>
+            <span>particle system #1</span>
+          </div>
+        </div>
+      </div>
+
+      <details class="particle-prompt">
+        <summary>
+          <span>Фоновая система частиц: Вводная часть / разработка логотипа</span>
+          <button class="copy-prompt" type="button" data-copy-target="prompt-intro">Скопировать промт</button>
+        </summary>
+        <pre id="prompt-intro"><code>A calm origin field for the opening brand concept section: particles behave like early visual thoughts forming from silence. Create a soft monochrome constellation that slowly gathers into abstract geometric hints of a future logo, then dissolves back into open space. The motion should feel like research, intuition, and discovery: sparse points, subtle orbital drift, gentle breathing scale, and occasional alignment into invisible construction axes. Cursor interaction must be very soft: nearby particles slightly lean away and then return with elastic calm, never chaotic. Keep the composition minimal, premium, slow, and readable, with low contrast and refined grayscale tones.
+
+Prefer low particle velocity, low contrast, no flashing, no aggressive repulsion, and preserve a central quiet reading zone.</code></pre>
+      </details>
+
+      <div class="cards-grid">
+        
+    <article class="page-card" id="page-001" data-search="обложка разработки логотипа открывающая страница проекта разработки визуального знака.    вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-001">Стр. 001</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Обложка разработки логотипа</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Открывающая страница проекта разработки визуального знака.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Черный фон. В центре маленькая строка с названием проекта.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-002" data-search="смысл названия страница с этимологией или смысловой расшифровкой названия бренда.  () -   вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-002">Стр. 002</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Смысл названия</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Страница с этимологией или смысловой расшифровкой названия бренда.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Белое поле. В центре короткая строка-расшифровка.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-003" data-search="ценности и желаемый образ задает тональность будущей айдентики и противопоставление рынку. , , , , , , , , , и еще раз . в этом смысле бренд должен выглядеть на шаг впереди конкурентов. в  часто присутствует стереотип , и задача визуальной системы - уверенно противопоставить себя этому.  вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-003">Стр. 003</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Ценности и желаемый образ</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Задает тональность будущей айдентики и противопоставление рынку.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>Логотип Weekend Billiard на светлом фоне.</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-004" data-search="визуальный анализ категории показывает визуальный фон категории и типовые приемы конкурентов.   вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-004">Стр. 004</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Визуальный анализ категории</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает визуальный фон категории и типовые приемы конкурентов.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>Сетка логотипов конкурентов (бильярдные клубы, магазины инвентаря).</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-005" data-search="анализ одноименных / похожих брендов показывает, как название или близкие визуальные мотивы выглядят в разных сферах.   вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-005">Стр. 005</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Анализ одноименных / похожих брендов</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает, как название или близкие визуальные мотивы выглядят в разных сферах.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>Примеры логотипов с ассоциациями выходного дня и бильярда.</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-006" data-search="аудит цифровой среды фиксирует состояние сайта / онлайн-коммуникации до ребрендинга.   вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-006">Стр. 006</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Аудит цифровой среды</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Фиксирует состояние сайта / онлайн-коммуникации до ребрендинга.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>Скриншот главной страницы weekend-billiard.ru до ребрендинга.</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-007" data-search="первичный эскиз фирменного блока показывает ранний вариант знака и логотипа.   вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-007">Стр. 007</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Первичный эскиз фирменного блока</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает ранний вариант знака и логотипа.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[В центре листа черно-белый эскиз: знак + логотип + дескриптор. Заменить на &quot;первичный эскиз фирменного блока&quot;.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-008" data-search="нумерация концепций переходная страница с порядковыми номерами вариантов. 1 2 3 4  вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-008">Стр. 008</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Нумерация концепций</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Переходная страница с порядковыми номерами вариантов.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Ряд номеров / маркеров концепций.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-009" data-search="ассоциации: инструмент и животное показывает набор резких, силовых и защитных образов для поиска символики.   вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-009">Стр. 009</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Ассоциации: инструмент и животное</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает набор резких, силовых и защитных образов для поиска символики.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Два изображения-референса: предмет / инструмент и животное в геометрической стилизации. Заменить на серые поля: &quot;ассоциативный предмет&quot; и &quot;ассоциативное животное&quot;.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-010" data-search="ассоциации: ряд объектов и агрессивный образ дополняет визуальный ряд формы, фактуры, динамики и характера.   вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-010">Стр. 010</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Ассоциации: ряд объектов и агрессивный образ</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Дополняет визуальный ряд формы, фактуры, динамики и характера.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Горизонтальный ряд предметов и фото животного / эмоции. Заменить на &quot;референс формы / модулей&quot; и &quot;референс характера&quot;.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-011" data-search="ассоциации: символика звезды / знака отличия показывает исторические или культурные формы символов отличия.   вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-011">Стр. 011</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Ассоциации: символика звезды / знака отличия</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает исторические или культурные формы символов отличия.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Несколько изображений знаков / звезд / эмблем. Заменить на серые поля: &quot;референс символа отличия&quot;.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-012" data-search="ассоциации: архитектура и детский рисунок показывает упрощение сложного образа до узнаваемого знака.   вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-012">Стр. 012</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Ассоциации: архитектура и детский рисунок</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает упрощение сложного образа до узнаваемого знака.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Слева фото архитектурного объекта, справа детский рисунок с похожей формой. Заменить на &quot;архитектурный референс&quot; и &quot;наивный рисунок формы&quot;.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-013" data-search="базовый символ фиксация простейшего графического модуля как отправной точки.  - простая геометрическая форма.  вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-013">Стр. 013</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Базовый символ</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Фиксация простейшего графического модуля как отправной точки.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Один малый черный знак в центре белого листа.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-014" data-search="масштабирование базового символа показывает, как знак собирается в более крупные структуры.   вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-014">Стр. 014</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Масштабирование базового символа</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает, как знак собирается в более крупные структуры.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Ряд: один знак, знак из нескольких модулей, крупная композиция из модулей.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-015" data-search="набор дополнительных знаков показывает вариативность знака как системы.   вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-015">Стр. 015</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Набор дополнительных знаков</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает вариативность знака как системы.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Горизонтальный ряд мини-знаков / треугольных вариантов. Заменить на &quot;варианты фирменного знака&quot;.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-016" data-search="инвертированный мотив проверка знака на темном фоне и в паттерне.   вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-016">Стр. 016</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Инвертированный мотив</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Проверка знака на темном фоне и в паттерне.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Черный фон, белый модульный геометрический знак в центре.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-017" data-search="цветовой акцент проверка знака в ярком акцентном цвете.   вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-017">Стр. 017</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Цветовой акцент</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Проверка знака в ярком акцентном цвете.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Вертикальная композиция из трех цветных модулей на белом фоне.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-018" data-search="малый фирменный блок проверка читаемости компактной версии логотипа.  с дескриптором.  вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-018">Стр. 018</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Малый фирменный блок</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Проверка читаемости компактной версии логотипа.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Небольшой логотип со знаком и статусной строкой в центре страницы.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-019" data-search="крупный логотип проверка леттеринга для больших носителей.  для крупных носителей.  вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-019">Стр. 019</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Крупный логотип</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Проверка леттеринга для больших носителей.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Крупное черное словесное написание на белом фоне.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-020" data-search="крупный логотип / инверсия проверка леттеринга на темном фоне.  для крупных носителей, инверсия.  вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-020">Стр. 020</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Крупный логотип / инверсия</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Проверка леттеринга на темном фоне.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Крупное белое словесное написание на черном фоне.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-021" data-search="знаки для нашивок / эмблем проверка использования знака в закрытых шевронных формах.   вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-021">Стр. 021</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Знаки для нашивок / эмблем</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Проверка использования знака в закрытых шевронных формах.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Три треугольные эмблемы / нашивки. Заменить на &quot;варианты эмблемы для формы&quot;.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-022" data-search="быстрые мокапы применения показывает, как система выглядит на форме, футболке, флаге, интерьерном носителе.   вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-022">Стр. 022</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Быстрые мокапы применения</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает, как система выглядит на форме, футболке, флаге, интерьерном носителе.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Коллаж мокапов: сотрудник в форме, спина формы, футболка, флаг, постер/табличка.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-023" data-search="мудборд паттернов и интерьерного применения показывает потенциал паттерна в архитектуре, текстиле, декоре и навигации.   вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-023">Стр. 023</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Мудборд паттернов и интерьерного применения</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает потенциал паттерна в архитектуре, текстиле, декоре и навигации.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Коллаж фотографий интерьеров, фасадов, тканей, подушек, стеновых панелей с геометрическим паттерном. Заменить на серые поля с подписями носителей.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-024" data-search="финальный слайд концепции закрывающая страница первой части. спасибо за внимание.  вводная часть / разработка логотипа">
+      <div class="page-topline">
+        <a class="page-number" href="#page-024">Стр. 024</a>
+        <span class="origin-section">Вводная часть / разработка логотипа</span>
+      </div>
+      <h3>Финальный слайд концепции</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Вводная часть / разработка логотипа</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Закрывающая страница первой части.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="intro">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Черный фон, в центре маленькая белая строка.]</p>
+      </div>
+    </article>
+      </div>
+    </section>
+
+    <section class="brand-section" id="section-constants" data-section="constants">
+      <div class="section-hero">
+        <iframe src="../logo_txt_rott_01.html" style="position:absolute; inset:0; width:100%; height:100%; border:none; mix-blend-mode:screen; opacity:0.4; pointer-events:none;"></iframe>
+        <div class="section-hero-content">
+          <div class="section-index">Раздел 02</div>
+          <h2>Константы фирменного стиля</h2>
+          <p>Знак, логотип, фирменный блок, цвета, шрифты, паттерны, правила применения.</p>
+          <div class="section-meta">
+            <span>стр. 025–105</span>
+            <span>particle system #2</span>
+          </div>
+        </div>
+      </div>
+
+      <details class="particle-prompt">
+        <summary>
+          <span>Фоновая система частиц: Константы фирменного стиля</span>
+          <button class="copy-prompt" type="button" data-copy-target="prompt-constants">Скопировать промт</button>
+        </summary>
+        <pre id="prompt-constants"><code>A precise modular particle system for brand constants: particles form a quiet geometric construction grid with recurring symbolic modules, proportions, safe zones, and invisible measurement logic. The structure should feel stable, rational, and professional: points align into triangles, circles, axes, and modular rows, then slowly breathe without losing order. Cursor interaction should subtly bend the grid like a soft magnetic field, creating a temporary local distortion that smoothly returns to perfect structure. Use restrained monochrome color with slight tonal variation, no bright effects, no visual noise, and a calm architectural rhythm.
+
+Prefer low particle velocity, low contrast, no flashing, no aggressive repulsion, and preserve a central quiet reading zone.</code></pre>
+      </details>
+
+      <div class="cards-grid">
+        
+    <article class="page-card" id="page-025" data-search="титул logobook отделяет блок правил использования логотипа.  / logobook /   logobook / мини-руководство">
+      <div class="page-topline">
+        <a class="page-number" href="#page-025">Стр. 025</a>
+        <span class="origin-section">Logobook / мини-руководство</span>
+      </div>
+      <h3>Титул logobook</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Отделяет блок правил использования логотипа.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Черный фон, тонкие диагональные линии, малая подпись внизу.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-026" data-search="вступление к руководству поясняет, кому предназначены правила и как пользоваться архивом файлов. данное руководство по использованию логотипа предлагается для ознакомления всем, кто по роду деятельности связан с визуальной средой . руководство не является догмой, однако стилеобразующие позиции, определенные и описанные в данном руководстве, должны точно выдерживаться в работе. к руководству прилагается архив с файлами. названия файлов соответствующих позиций обозначены сносками в левом нижнем углу страницы.  logobook / мини-руководство">
+      <div class="page-topline">
+        <a class="page-number" href="#page-026">Стр. 026</a>
+        <span class="origin-section">Logobook / мини-руководство</span>
+      </div>
+      <h3>Вступление к руководству</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Поясняет, кому предназначены правила и как пользоваться архивом файлов.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Белая страница с текстовым блоком и небольшим навигационным маркером.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-027" data-search="знак фиксирует базовую геометрию, минимальные размеры и охранное поле. . . минимальный размер на экране:  px. минимальный размер при печати:  мм. охранное поле строится по модулю .  logobook / мини-руководство">
+      <div class="page-topline">
+        <a class="page-number" href="#page-027">Стр. 027</a>
+        <span class="origin-section">Logobook / мини-руководство</span>
+      </div>
+      <h3>Знак</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Фиксирует базовую геометрию, минимальные размеры и охранное поле.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Большой знак в центре. Вокруг указаны размерные модули / поля.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-028" data-search="фирменные цвета задает основной набор цветов и принцип дополнительных цветов. основные фирменные цвета -  и , но в качестве дополнительных можно использовать другие цвета, уместные для ситуации. цветным может быть также материал носителя, например бумага. для каждого цвета указываются pantone, rgb, hex и cmyk.  logobook / мини-руководство">
+      <div class="page-topline">
+        <a class="page-number" href="#page-028">Стр. 028</a>
+        <span class="origin-section">Logobook / мини-руководство</span>
+      </div>
+      <h3>Фирменные цвета</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Задает основной набор цветов и принцип дополнительных цветов.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Два цветовых образца: основной темный и основной светлый / белый.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-029" data-search="масштабирование знака показывает модульность и возможность собирать знак из других знаков или объектов. знак может масштабироваться или собираться в более крупный из уже изготовленных знаков. также  может быть собран из других объектов: например, на групповой фотографии сотрудники могут выстраиваться в форме .  logobook / мини-руководство">
+      <div class="page-topline">
+        <a class="page-number" href="#page-029">Стр. 029</a>
+        <span class="origin-section">Logobook / мини-руководство</span>
+      </div>
+      <h3>Масштабирование знака</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает модульность и возможность собирать знак из других знаков или объектов.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Ряд знаков: 1x, 4x, 16x, 64x, 256x / растущие модульные композиции.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-030" data-search="дополнительные знаки показывает набор элементов фирменного стиля. элементы фирменного стиля. дополнительные знаки могут использоваться для паттернов, фирменных блоков направлений деятельности и рекламных материалов.  logobook / мини-руководство">
+      <div class="page-topline">
+        <a class="page-number" href="#page-030">Стр. 030</a>
+        <span class="origin-section">Logobook / мини-руководство</span>
+      </div>
+      <h3>Дополнительные знаки</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает набор элементов фирменного стиля.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Сетка из 15 знаков, пронумерованных 1-15.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-031" data-search="дополнительный паттерн #2 показывает один вариант фирменного паттерна и его масштабирование. дополнительный паттерн #2.  logobook / мини-руководство">
+      <div class="page-topline">
+        <a class="page-number" href="#page-031">Стр. 031</a>
+        <span class="origin-section">Logobook / мини-руководство</span>
+      </div>
+      <h3>Дополнительный паттерн #2</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает один вариант фирменного паттерна и его масштабирование.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Слева малый модуль, справа крупная повторяемая поверхность паттерна.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-032" data-search="дополнительный паттерн #3 показывает один вариант фирменного паттерна и его масштабирование. дополнительный паттерн #3.  logobook / мини-руководство">
+      <div class="page-topline">
+        <a class="page-number" href="#page-032">Стр. 032</a>
+        <span class="origin-section">Logobook / мини-руководство</span>
+      </div>
+      <h3>Дополнительный паттерн #3</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает один вариант фирменного паттерна и его масштабирование.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Слева малый модуль, справа крупная повторяемая поверхность паттерна.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-033" data-search="дополнительный паттерн #4 показывает один вариант фирменного паттерна и его масштабирование. дополнительный паттерн #4.  logobook / мини-руководство">
+      <div class="page-topline">
+        <a class="page-number" href="#page-033">Стр. 033</a>
+        <span class="origin-section">Logobook / мини-руководство</span>
+      </div>
+      <h3>Дополнительный паттерн #4</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает один вариант фирменного паттерна и его масштабирование.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Слева малый модуль, справа крупная повторяемая поверхность паттерна.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-034" data-search="дополнительный паттерн #5 показывает один вариант фирменного паттерна и его масштабирование. дополнительный паттерн #5.  logobook / мини-руководство">
+      <div class="page-topline">
+        <a class="page-number" href="#page-034">Стр. 034</a>
+        <span class="origin-section">Logobook / мини-руководство</span>
+      </div>
+      <h3>Дополнительный паттерн #5</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает один вариант фирменного паттерна и его масштабирование.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Слева малый модуль, справа крупная повторяемая поверхность паттерна.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-035" data-search="дополнительный паттерн #6 показывает один вариант фирменного паттерна и его масштабирование. дополнительный паттерн #6.  logobook / мини-руководство">
+      <div class="page-topline">
+        <a class="page-number" href="#page-035">Стр. 035</a>
+        <span class="origin-section">Logobook / мини-руководство</span>
+      </div>
+      <h3>Дополнительный паттерн #6</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает один вариант фирменного паттерна и его масштабирование.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Слева малый модуль, справа крупная повторяемая поверхность паттерна.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-036" data-search="логотип для крупных носителей фиксирует уникальное словесное написание. логотип для крупных носителей. написание уникальное, не является шрифтом.  logobook / мини-руководство">
+      <div class="page-topline">
+        <a class="page-number" href="#page-036">Стр. 036</a>
+        <span class="origin-section">Logobook / мини-руководство</span>
+      </div>
+      <h3>Логотип для крупных носителей</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Фиксирует уникальное словесное написание.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Крупный черный логотип на белом фоне.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-037" data-search="логотип для крупных носителей / инверсия фиксирует инверсную версию логотипа. логотип для крупных носителей (инверсия).  logobook / мини-руководство">
+      <div class="page-topline">
+        <a class="page-number" href="#page-037">Стр. 037</a>
+        <span class="origin-section">Logobook / мини-руководство</span>
+      </div>
+      <h3>Логотип для крупных носителей / инверсия</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Фиксирует инверсную версию логотипа.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Крупный белый логотип на черном фоне.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-038" data-search="фирменный блок фиксирует логотип со знаком и статусной строкой. логотип со знаком и статусной строкой. статусная строка  может меняться на слоган, дескриптор или интернет-адрес. статусная строка набирается .  logobook / мини-руководство">
+      <div class="page-topline">
+        <a class="page-number" href="#page-038">Стр. 038</a>
+        <span class="origin-section">Logobook / мини-руководство</span>
+      </div>
+      <h3>Фирменный блок</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Фиксирует логотип со знаком и статусной строкой.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Композиция: знак + логотип + статусная строка.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-039" data-search="фирменный блок / инверсия фиксирует инверсный вариант фирменного блока. логотип со знаком и статусной строкой (инверсия).  logobook / мини-руководство">
+      <div class="page-topline">
+        <a class="page-number" href="#page-039">Стр. 039</a>
+        <span class="origin-section">Logobook / мини-руководство</span>
+      </div>
+      <h3>Фирменный блок / инверсия</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Фиксирует инверсный вариант фирменного блока.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Композиция на черном фоне: белый знак + белый логотип + статусная строка.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-040" data-search="фирменный блок для нашивок и наклеек показывает закрытые версии фирменного блока для малых носителей. фирменный блок для нашивок и наклеек.  logobook / мини-руководство">
+      <div class="page-topline">
+        <a class="page-number" href="#page-040">Стр. 040</a>
+        <span class="origin-section">Logobook / мини-руководство</span>
+      </div>
+      <h3>Фирменный блок для нашивок и наклеек</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает закрытые версии фирменного блока для малых носителей.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Шесть вариантов компактных треугольных блоков / эмблем.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-041" data-search="кредитная страница закрывает первый logobook и фиксирует автора разработки. разработано в .  logobook / мини-руководство">
+      <div class="page-topline">
+        <a class="page-number" href="#page-041">Стр. 041</a>
+        <span class="origin-section">Logobook / мини-руководство</span>
+      </div>
+      <h3>Кредитная страница</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Закрывает первый logobook и фиксирует автора разработки.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Черный фон, в центре небольшая строка.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-086" data-search="обложка главный титул руководства по использованию фирменного стиля. руководство по использованию фирменного стиля.  руководство по фирменному стилю">
+      <div class="page-topline">
+        <a class="page-number" href="#page-086">Стр. 086</a>
+        <span class="origin-section">Руководство по фирменному стилю</span>
+      </div>
+      <h3>Обложка</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Главный титул руководства по использованию фирменного стиля.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Белый фон, крупный фрагмент паттерна слева, логотип вверху справа, диагональная сетка.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-087" data-search="введение объясняет статус документа и приложение с файлами. данное руководство по использованию логотипа предлагается для ознакомления всем, кто по роду деятельности связан с визуальной средой . руководство не является догмой, однако стилеобразующие позиции, определенные и описанные в данном руководстве, должны точно выдерживаться в работе. к руководству прилагается архив с файлами. названия файлов соответствующих позиций обозначены сносками в левом нижнем углу страницы.  руководство по фирменному стилю">
+      <div class="page-topline">
+        <a class="page-number" href="#page-087">Стр. 087</a>
+        <span class="origin-section">Руководство по фирменному стилю</span>
+      </div>
+      <h3>Введение</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Объясняет статус документа и приложение с файлами.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Текстовый разворот с малым логотипом / маркером.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-088" data-search="содержание список всех разделов руководства и страниц. содержание: константы фирменного стиля; знак; масштабирование знака; дополнительные знаки; паттерны; фирменные цвета; фирменные шрифты; фирменный блок; логотип для крупных носителей; фирменные блоки направлений; деловая документация; визитки; конверты; бланки; коммерческое предложение; презентация; адресный блок; наклейки; автомобили; форма сотрудников; сувениры; рекламные материалы; вывеска.  руководство по фирменному стилю">
+      <div class="page-topline">
+        <a class="page-number" href="#page-088">Стр. 088</a>
+        <span class="origin-section">Руководство по фирменному стилю</span>
+      </div>
+      <h3>Содержание</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Список всех разделов руководства и страниц.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Двухколоночное содержание с номерами страниц и линиями.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-089" data-search="разделитель: константы открывает раздел базовых элементов айдентики. константы фирменного стиля.  константы фирменного стиля">
+      <div class="page-topline">
+        <a class="page-number" href="#page-089">Стр. 089</a>
+        <span class="origin-section">Константы фирменного стиля</span>
+      </div>
+      <h3>Разделитель: константы</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Открывает раздел базовых элементов айдентики.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Черный разделительный слайд с тонкими диагональными линиями и названием раздела.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-090" data-search="знак фиксирует базовый знак, минимальные размеры и охранные поля. . . минимальный размер на экране:  px. минимальный размер при печати:  мм. охранное поле строится по модулю .  константы фирменного стиля">
+      <div class="page-topline">
+        <a class="page-number" href="#page-090">Стр. 090</a>
+        <span class="origin-section">Константы фирменного стиля</span>
+      </div>
+      <h3>Знак</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Фиксирует базовый знак, минимальные размеры и охранные поля.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Большой знак в центре страницы с размерными маркерами.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-091" data-search="масштабирование знака показывает масштабируемость и принцип сборки из модулей. знак может масштабироваться или собираться в более крупный из уже изготовленных знаков. также  может быть собран из других объектов: например, на групповой фотографии сотрудники могут выстраиваться в форме .  константы фирменного стиля">
+      <div class="page-topline">
+        <a class="page-number" href="#page-091">Стр. 091</a>
+        <span class="origin-section">Константы фирменного стиля</span>
+      </div>
+      <h3>Масштабирование знака</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает масштабируемость и принцип сборки из модулей.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Ряд модульных знаков разного размера: от одиночного знака до сложной композиции.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-092" data-search="дополнительные знаки показывает вспомогательные знаки для паттернов, направлений и рекламы. дополнительные знаки могут использоваться для построения паттернов, фирменных блоков направлений деятельности и рекламных материалов.  константы фирменного стиля">
+      <div class="page-topline">
+        <a class="page-number" href="#page-092">Стр. 092</a>
+        <span class="origin-section">Константы фирменного стиля</span>
+      </div>
+      <h3>Дополнительные знаки</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает вспомогательные знаки для паттернов, направлений и рекламы.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Сетка из 15 дополнительных знаков.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-093" data-search="паттерн / основные варианты задает базовые варианты использования паттерна. основные варианты использования .  константы фирменного стиля">
+      <div class="page-topline">
+        <a class="page-number" href="#page-093">Стр. 093</a>
+        <span class="origin-section">Константы фирменного стиля</span>
+      </div>
+      <h3>Паттерн / основные варианты</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Задает базовые варианты использования паттерна.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Два квадратных образца паттерна: плотный и разреженный.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-094" data-search="паттерн / дополнительный #2 показывает один из дополнительных орнаментов. дополнительный паттерн #2.  константы фирменного стиля">
+      <div class="page-topline">
+        <a class="page-number" href="#page-094">Стр. 094</a>
+        <span class="origin-section">Константы фирменного стиля</span>
+      </div>
+      <h3>Паттерн / дополнительный #2</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает один из дополнительных орнаментов.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Слева малый модуль, справа большая поверхность: линейно-геометрический модуль, собираемый в гексагональную поверхность.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-095" data-search="паттерн / дополнительный #3 показывает один из дополнительных орнаментов. дополнительный паттерн #3.  константы фирменного стиля">
+      <div class="page-topline">
+        <a class="page-number" href="#page-095">Стр. 095</a>
+        <span class="origin-section">Константы фирменного стиля</span>
+      </div>
+      <h3>Паттерн / дополнительный #3</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает один из дополнительных орнаментов.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Слева малый модуль, справа большая поверхность: тонкая сетка / многолучевой модуль.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-096" data-search="паттерн / дополнительный #4 показывает один из дополнительных орнаментов. дополнительный паттерн #4.  константы фирменного стиля">
+      <div class="page-topline">
+        <a class="page-number" href="#page-096">Стр. 096</a>
+        <span class="origin-section">Константы фирменного стиля</span>
+      </div>
+      <h3>Паттерн / дополнительный #4</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает один из дополнительных орнаментов.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Слева малый модуль, справа большая поверхность: плотная гексагональная сетка с пересечениями.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-097" data-search="паттерн / дополнительный #5 показывает один из дополнительных орнаментов. дополнительный паттерн #5.  константы фирменного стиля">
+      <div class="page-topline">
+        <a class="page-number" href="#page-097">Стр. 097</a>
+        <span class="origin-section">Константы фирменного стиля</span>
+      </div>
+      <h3>Паттерн / дополнительный #5</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает один из дополнительных орнаментов.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Слева малый модуль, справа большая поверхность: серый тональный паттерн с тонкими линиями.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-098" data-search="фирменные цвета фиксирует основные цвета, дополнительные цвета и материалы. основные фирменные цвета -  и . в качестве дополнительных можно использовать цвета, уместные для ситуации. цветным может быть материал носителя, например бумага. для каждого цвета указываются pantone, rgb, hex и cmyk.  константы фирменного стиля">
+      <div class="page-topline">
+        <a class="page-number" href="#page-098">Стр. 098</a>
+        <span class="origin-section">Константы фирменного стиля</span>
+      </div>
+      <h3>Фирменные цвета</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Фиксирует основные цвета, дополнительные цвета и материалы.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Два цветовых образца с техническими значениями.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-099" data-search="фирменные шрифты задает роли шрифтов в системе.  - дескриптор логотипа.  - заголовки.  - основной текст. для каждого шрифта приводятся кириллический алфавит, строчные буквы и цифры.  константы фирменного стиля">
+      <div class="page-topline">
+        <a class="page-number" href="#page-099">Стр. 099</a>
+        <span class="origin-section">Константы фирменного стиля</span>
+      </div>
+      <h3>Фирменные шрифты</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Задает роли шрифтов в системе.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Три строки шрифтовых образцов с подписями ролей.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-100" data-search="фирменный блок показывает построение логотипа со знаком и статусной строкой. логотип со знаком и статусной строкой. статусная строка  может меняться на другое подразделение компании или слоган. статусная строка набрана .  константы фирменного стиля">
+      <div class="page-topline">
+        <a class="page-number" href="#page-100">Стр. 100</a>
+        <span class="origin-section">Константы фирменного стиля</span>
+      </div>
+      <h3>Фирменный блок</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает построение логотипа со знаком и статусной строкой.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>Схема конструкции бильярдного стола.</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-101" data-search="фирменный блок / инверсия показывает инверсную версию фирменного блока. логотип со знаком и статусной строкой (инверсия).  константы фирменного стиля">
+      <div class="page-topline">
+        <a class="page-number" href="#page-101">Стр. 101</a>
+        <span class="origin-section">Константы фирменного стиля</span>
+      </div>
+      <h3>Фирменный блок / инверсия</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает инверсную версию фирменного блока.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Белый фирменный блок на черном фоне.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-102" data-search="логотип для крупных носителей показывает кастомное словесное написание. логотип для крупных носителей. написание уникальное и не является шрифтом.  константы фирменного стиля">
+      <div class="page-topline">
+        <a class="page-number" href="#page-102">Стр. 102</a>
+        <span class="origin-section">Константы фирменного стиля</span>
+      </div>
+      <h3>Логотип для крупных носителей</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает кастомное словесное написание.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Крупный логотип на белом фоне.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-103" data-search="логотип для крупных носителей / инверсия показывает инверсию крупного логотипа. логотип для крупных носителей. инверсия.  константы фирменного стиля">
+      <div class="page-topline">
+        <a class="page-number" href="#page-103">Стр. 103</a>
+        <span class="origin-section">Константы фирменного стиля</span>
+      </div>
+      <h3>Логотип для крупных носителей / инверсия</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает инверсию крупного логотипа.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Крупный белый логотип на черном фоне.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-104" data-search="фирменный блок для направлений объясняет, как использовать разные знаки для направлений деятельности. для направлений деятельности компании могут использоваться дополнительные варианты фирменного знака. каждое направление получает свой знак и подпись .  константы фирменного стиля">
+      <div class="page-topline">
+        <a class="page-number" href="#page-104">Стр. 104</a>
+        <span class="origin-section">Константы фирменного стиля</span>
+      </div>
+      <h3>Фирменный блок для направлений</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Объясняет, как использовать разные знаки для направлений деятельности.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Три фирменных блока с разными знаками и подписями направлений.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-105" data-search="дополнительный фирменный блок показывает расширенный набор блоков для других направлений. дополнительный фирменный блок может использоваться для других направлений деятельности компании.  константы фирменного стиля">
+      <div class="page-topline">
+        <a class="page-number" href="#page-105">Стр. 105</a>
+        <span class="origin-section">Константы фирменного стиля</span>
+      </div>
+      <h3>Дополнительный фирменный блок</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Константы фирменного стиля</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает расширенный набор блоков для других направлений.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="constants">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Сетка фирменных блоков с разными знаками, подписями и цветами / инверсиями.]</p>
+      </div>
+    </article>
+      </div>
+    </section>
+
+    <section class="brand-section" id="section-docs" data-section="docs">
+      <div class="section-hero">
+        <iframe src="../logo_txt_rott_01.html" style="position:absolute; inset:0; width:100%; height:100%; border:none; mix-blend-mode:screen; opacity:0.4; pointer-events:none;"></iframe>
+        <div class="section-hero-content">
+          <div class="section-index">Раздел 03</div>
+          <h2>Деловая документация</h2>
+          <p>Визитки, конверты, бланки, адресные блоки, КП, презентации и текстовые шаблоны.</p>
+          <div class="section-meta">
+            <span>стр. 042–122</span>
+            <span>particle system #3</span>
+          </div>
+        </div>
+      </div>
+
+      <details class="particle-prompt">
+        <summary>
+          <span>Фоновая система частиц: Деловая документация</span>
+          <button class="copy-prompt" type="button" data-copy-target="prompt-docs">Скопировать промт</button>
+        </summary>
+        <pre id="prompt-docs"><code>A paper-and-typography inspired particle background for business documentation: particles should resemble microscopic paper fibers, text baselines, invisible margins, and document layout guides. Create a calm field of horizontal and vertical flows, with particles gently organizing into page-like columns, letter-spacing rhythms, and soft rectangular zones. The animation must be extremely subtle, like air moving across sheets of premium paper. Cursor interaction should create a slow ripple in the document grid, as if the cursor is a soft pressure point under translucent paper. Keep the visual light, elegant, highly readable, and mostly white-gray.
+
+Prefer low particle velocity, low contrast, no flashing, no aggressive repulsion, and preserve a central quiet reading zone.</code></pre>
+      </details>
+
+      <div class="cards-grid">
+        
+    <article class="page-card" id="page-042" data-search="титул блока id отделяет блок применений фирменного стиля на носителях.  / id /   id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-042">Стр. 042</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Титул блока ID</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Отделяет блок применений фирменного стиля на носителях.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Черный фон, тонкие диагональные линии, малая подпись внизу.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-043" data-search="визитная карточка / вариант #1 показывает разные решения лицевой и оборотной стороны визитки. корпоративная визитная карточка: , . именная визитная карточка: , . поля данных: , , , , , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-043">Стр. 043</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Визитная карточка / вариант #1</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает разные решения лицевой и оборотной стороны визитки.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Мокапы визитных карточек: корпоративная карточка + именная карточка с насыщенным паттерном на обороте. Все персональные данные заменить на токены.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-044" data-search="визитная карточка / вариант #2 показывает разные решения лицевой и оборотной стороны визитки. корпоративная визитная карточка: , . именная визитная карточка: , . поля данных: , , , , , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-044">Стр. 044</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Визитная карточка / вариант #2</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает разные решения лицевой и оборотной стороны визитки.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Мокапы визитных карточек: корпоративная карточка + именная карточка с линейным паттерном на обороте. Все персональные данные заменить на токены.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-045" data-search="визитная карточка / вариант #3 показывает разные решения лицевой и оборотной стороны визитки. корпоративная визитная карточка: , . именная визитная карточка: , . поля данных: , , , , , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-045">Стр. 045</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Визитная карточка / вариант #3</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает разные решения лицевой и оборотной стороны визитки.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Мокапы визитных карточек: корпоративная карточка + именная карточка с мелким регулярным паттерном на обороте. Все персональные данные заменить на токены.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-046" data-search="визитная карточка / вариант #4 показывает разные решения лицевой и оборотной стороны визитки. корпоративная визитная карточка: , . именная визитная карточка: , . поля данных: , , , , , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-046">Стр. 046</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Визитная карточка / вариант #4</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает разные решения лицевой и оборотной стороны визитки.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Мокапы визитных карточек: корпоративная карточка + именная карточка с темным геометрическим паттерном. Все персональные данные заменить на токены.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-047" data-search="конверт / вариант #1 показывает размещение адресного блока и логотипа на конверте. конверт формата . адресный блок: , , , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-047">Стр. 047</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Конверт / вариант #1</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает размещение адресного блока и логотипа на конверте.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Горизонтальный или вертикальный конверт с логотипом, адресным блоком и опциональным паттерном.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-048" data-search="конверт / вариант #1 показывает размещение адресного блока и логотипа на конверте. конверт формата . адресный блок: , , , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-048">Стр. 048</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Конверт / вариант #1</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает размещение адресного блока и логотипа на конверте.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Горизонтальный или вертикальный конверт с логотипом, адресным блоком и опциональным паттерном.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-049" data-search="конверт / вариант #2 показывает размещение адресного блока и логотипа на конверте. конверт формата . адресный блок: , , , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-049">Стр. 049</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Конверт / вариант #2</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает размещение адресного блока и логотипа на конверте.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Горизонтальный или вертикальный конверт с логотипом, адресным блоком и опциональным паттерном.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-050" data-search="конверт / вариант #2 показывает размещение адресного блока и логотипа на конверте. конверт формата . адресный блок: , , , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-050">Стр. 050</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Конверт / вариант #2</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает размещение адресного блока и логотипа на конверте.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Горизонтальный или вертикальный конверт с логотипом, адресным блоком и опциональным паттерном.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-051" data-search="фирменный бланк / вариант #1 показывает простой бланк без реквизитов. фирменный бланк a4. используется для деловой документации, не требующей полного юридического блока.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-051">Стр. 051</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Фирменный бланк / вариант #1</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает простой бланк без реквизитов.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Лист A4 с логотипом, малым адресным блоком и большим белым полем.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-052" data-search="фирменный бланк / вариант #2 показывает альтернативное расположение логотипа и реквизитов. фирменный бланк a4. вариант с более чистым верхним полем и минимальным нижним блоком.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-052">Стр. 052</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Фирменный бланк / вариант #2</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает альтернативное расположение логотипа и реквизитов.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Лист A4 с логотипом вверху / сбоку и минимальными данными.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-053" data-search="фирменный бланк / вариант #3 показывает бланк с адресным и контактным блоком. фирменный бланк a4 с контактными данными: , , , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-053">Стр. 053</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Фирменный бланк / вариант #3</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает бланк с адресным и контактным блоком.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Лист A4 с логотипом и контактами в верхнем правом поле.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-054" data-search="фирменный бланк с реквизитами показывает официальный бланк с юридическими реквизитами. бланк с реквизитами компании: , , , , , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-054">Стр. 054</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Фирменный бланк с реквизитами</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает официальный бланк с юридическими реквизитами.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Лист A4 с реквизитами в нижнем блоке.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-055" data-search="фирменный бланк / продолжение показывает вторую страницу многостраничного документа. бланк-продолжение a4 без полного верхнего блока, с сохранением фирменной системы.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-055">Стр. 055</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Фирменный бланк / продолжение</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает вторую страницу многостраничного документа.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Чистый лист продолжения с минимальным маркером / номером страницы.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-056" data-search="адресный блок показывает компактную карточку с контактными данными. адресный блок: , , , , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-056">Стр. 056</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Адресный блок</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает компактную карточку с контактными данными.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Небольшая светлая карточка с контактами, логотипом и маркерами.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-057" data-search="основные варианты паттерна показывает базовые паттерны как ресурс для носителей. основные варианты  и .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-057">Стр. 057</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Основные варианты паттерна</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает базовые паттерны как ресурс для носителей.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Два квадрата: плотный паттерн и разреженный паттерн.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-058" data-search="коммерческое предложение / обложка и страница показывает титульную страницу и внутреннюю страницу ткп. шаблон технико-коммерческого предложения: , , , , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-058">Стр. 058</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Коммерческое предложение / обложка и страница</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает титульную страницу и внутреннюю страницу ТКП.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Два листа A4: титул ТКП и страница с нормативными документами / таблицей.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-059" data-search="коммерческое предложение / таблицы и сокращения показывает стили таблиц, списков сокращений и сводных расчетов. шаблон для страницы сокращений и сводной таблицы по объекту / смете.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-059">Стр. 059</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Коммерческое предложение / таблицы и сокращения</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает стили таблиц, списков сокращений и сводных расчетов.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Два листа A4: список аббревиатур и таблица с ценами / итогами.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-060" data-search="шаблон презентации / титульный слайд показывает сетку презентации и место для фото/паттерна. .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-060">Стр. 060</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Шаблон презентации / титульный слайд</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает сетку презентации и место для фото/паттерна.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Титульный слайд: слева фото/паттерн в клиновидной маске, справа логотип и большое свободное поле.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-061" data-search="шаблон презентации / варианты титула показывает вариативность иллюстраций и инверсии презентационного шаблона.  повторяется как текстовый маркер.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-061">Стр. 061</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Шаблон презентации / варианты титула</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает вариативность иллюстраций и инверсии презентационного шаблона.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Три титульных слайда: цветная иллюстрация, черно-белая иллюстрация, цветная иллюстрация справа.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-062" data-search="профиль компании показывает текстовый слайд о компании. профиль компании.  работает на рынке  с . сегодня мы являемся одним из  игроков, предоставляющих . мы работаем с  и обеспечиваем . комплексность услуг основана на ,  и .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-062">Стр. 062</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Профиль компании</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает текстовый слайд о компании.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Слайд с крупным заголовком и несколькими абзацами текста.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-063" data-search="презентация / продукт или технология показывает слайд с описанием услуги и предметной фотографией. . маркированный список преимуществ: , , , , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-063">Стр. 063</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Презентация / продукт или технология</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает слайд с описанием услуги и предметной фотографией.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Слайд с продуктовой фотографией справа и списком слева.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-064" data-search="презентация / перечень объектов показывает слайд с кейсами / объектами / клиентами. перечень объектов. для каждого объекта: , , , , , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-064">Стр. 064</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Презентация / перечень объектов</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает слайд с кейсами / объектами / клиентами.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Слайд с четырьмя карточками объектов и мини-фото слева.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-065" data-search="презентация / услуги показывает структуру направлений деятельности. услуги : , , , . в каждом направлении перечисляются конкретные услуги / продукты.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-065">Стр. 065</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Презентация / услуги</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает структуру направлений деятельности.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Слайд с несколькими колонками услуг, каждый блок помечен маленьким фирменным знаком.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-066" data-search="презентация / структура компании показывает организационную схему. структура компании:  - , , , , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-066">Стр. 066</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Презентация / структура компании</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает организационную схему.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Горизонтальная организационная схема с линиями и подразделениями.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-067" data-search="презентация / финальный контактный слайд закрывает презентацию и дублирует адресный блок. . , , , , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-067">Стр. 067</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Презентация / финальный контактный слайд</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Закрывает презентацию и дублирует адресный блок.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Финальный слайд с диагональной маской и контактами справа.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-106" data-search="разделитель: деловая документация открывает раздел носителей деловой документации. деловая документация.  деловая документация">
+      <div class="page-topline">
+        <a class="page-number" href="#page-106">Стр. 106</a>
+        <span class="origin-section">Деловая документация</span>
+      </div>
+      <h3>Разделитель: деловая документация</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Открывает раздел носителей деловой документации.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Черный разделительный слайд с диагональной сеткой.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-107" data-search="визитная карточка описывает корпоративную и именную визитку, материалы и способ печати. корпоративная и именная визитные карточки. для печати визиток рекомендуется использовать гладкий картон высокой степени белизны, плотностью не менее 300 г/м². способ печати: офсет либо цифровой офсет. поля данных: , , , , , .  деловая документация">
+      <div class="page-topline">
+        <a class="page-number" href="#page-107">Стр. 107</a>
+        <span class="origin-section">Деловая документация</span>
+      </div>
+      <h3>Визитная карточка</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Описывает корпоративную и именную визитку, материалы и способ печати.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Мокап корпоративной визитки и именной визитки с паттерновой оборотной стороной.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-108" data-search="оборотная сторона визитки показывает набор вариантов оборотной стороны для разных направлений. для разных направлений деятельности может быть использована индивидуальная оборотная сторона визитной карточки.  деловая документация">
+      <div class="page-topline">
+        <a class="page-number" href="#page-108">Стр. 108</a>
+        <span class="origin-section">Деловая документация</span>
+      </div>
+      <h3>Оборотная сторона визитки</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает набор вариантов оборотной стороны для разных направлений.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Четыре вертикальных паттерновых оборота визитки.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-109" data-search="конверт «евро» показывает конверт dl/e65. конверт формата «евро» dl/e65, . адресный блок: , , , .  деловая документация">
+      <div class="page-topline">
+        <a class="page-number" href="#page-109">Стр. 109</a>
+        <span class="origin-section">Деловая документация</span>
+      </div>
+      <h3>Конверт «Евро»</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает конверт DL/E65.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Горизонтальный светлый конверт с логотипом слева и адресным блоком.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-110" data-search="конверт a4 показывает крупный конверт a4. конверт формата a4, . адресный блок: , , , .  деловая документация">
+      <div class="page-topline">
+        <a class="page-number" href="#page-110">Стр. 110</a>
+        <span class="origin-section">Деловая документация</span>
+      </div>
+      <h3>Конверт A4</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает крупный конверт A4.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Вертикальный или крупный светлый конверт с логотипом и адресным блоком.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-111" data-search="фирменный бланк описывает простой фирменный бланк и шрифтовые параметры. основной фирменный бланк используется для деловой документации, которая не требует официальных реквизитов компании. основные шрифтовые характеристики: реквизиты - , ; название документа - , ; текст документа - , , межстрочный интервал , интервалы до/после абзаца ; подписи - , .  деловая документация">
+      <div class="page-topline">
+        <a class="page-number" href="#page-111">Стр. 111</a>
+        <span class="origin-section">Деловая документация</span>
+      </div>
+      <h3>Фирменный бланк</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Описывает простой фирменный бланк и шрифтовые параметры.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Лист A4 с размерными отступами и примером документа.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-112" data-search="фирменный бланк с реквизитами описывает официальный бланк с юридическим блоком. используется для отправки официальной корреспонденции. включает реквизиты, дату, адресата, название документа, текст документа и подписи. для каждого элемента фиксируются шрифт, кегль, разрядка, межстрочный интервал и абзацные интервалы.  деловая документация">
+      <div class="page-topline">
+        <a class="page-number" href="#page-112">Стр. 112</a>
+        <span class="origin-section">Деловая документация</span>
+      </div>
+      <h3>Фирменный бланк с реквизитами</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Описывает официальный бланк с юридическим блоком.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Лист A4 с размерными направляющими, блоком реквизитов и примером письма.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-113" data-search="фирменный бланк акта описывает специальный бланк акта / выездного документа. используется в качестве бланка акта при выезде на объект / выполнении услуги. содержит реквизиты, название документа, таблицу / поля акта, подписи. для текста акта допустим меньший интервал до/после абзаца.  деловая документация">
+      <div class="page-topline">
+        <a class="page-number" href="#page-113">Стр. 113</a>
+        <span class="origin-section">Деловая документация</span>
+      </div>
+      <h3>Фирменный бланк акта</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Описывает специальный бланк акта / выездного документа.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Лист A4 с шаблоном акта, полями для заполнения и размерной сеткой.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-114" data-search="шаблон технико-коммерческого предложения / титул задает стили титульного листа коммерческого предложения. шаблон технико-коммерческого предложения. для титульного листа фиксируются: название документа, пояснение к заголовку, заголовок напротив логотипа, подписи / блок «разработано». для каждого элемента указываются шрифт, кегль, интерлиньяж и цвет.  деловая документация">
+      <div class="page-topline">
+        <a class="page-number" href="#page-114">Стр. 114</a>
+        <span class="origin-section">Деловая документация</span>
+      </div>
+      <h3>Шаблон технико-коммерческого предложения / титул</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Задает стили титульного листа коммерческого предложения.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Титульный лист ТКП с логотипом, заголовками, подписями и направляющими.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-115" data-search="шаблон технико-коммерческого предложения / стили текста задает типографику внутренних страниц. стили форматирования текста в документе: заголовок 1, заголовок 2, заголовок 3, основной текст, маркированный / нумерованный список, таблица, колонтитулы. для каждого стиля фиксируются шрифт, кегль, межстрочный интервал, интервалы до/после, отступы и обрамление.  деловая документация">
+      <div class="page-topline">
+        <a class="page-number" href="#page-115">Стр. 115</a>
+        <span class="origin-section">Деловая документация</span>
+      </div>
+      <h3>Шаблон технико-коммерческого предложения / стили текста</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Задает типографику внутренних страниц.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Страница с перечнем стилей и технических параметров.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-116" data-search="шаблон технико-коммерческого предложения / примеры страниц показывает разворот или набор страниц ткп. шаблон внутренних страниц технико-коммерческого предложения: содержание, сокращения, текстовые разделы, таблицы и итоговые блоки.  деловая документация">
+      <div class="page-topline">
+        <a class="page-number" href="#page-116">Стр. 116</a>
+        <span class="origin-section">Деловая документация</span>
+      </div>
+      <h3>Шаблон технико-коммерческого предложения / примеры страниц</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает разворот или набор страниц ТКП.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Миниатюры нескольких страниц ТКП с таблицами, списками и текстовыми блоками.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-117" data-search="шаблон презентации / титул задает правила электронных презентаций. электронные презентации оформляются в соответствии с фирменным стилем  и предполагают использование разных элементов стиля - логотипа, фирменных шрифтов, паттернов и дополнительных знаков. в разделе приведены основные страницы презентации, демонстрирующие примеры использования элементов фирменного стиля.  деловая документация">
+      <div class="page-topline">
+        <a class="page-number" href="#page-117">Стр. 117</a>
+        <span class="origin-section">Деловая документация</span>
+      </div>
+      <h3>Шаблон презентации / титул</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Задает правила электронных презентаций.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Титульный слайд с крупным фото/паттерном слева, диагональной маской, логотипом и слоганом.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-118" data-search="шаблон презентации / варианты титула показывает гибкость титульных слайдов.  - повторяющийся текстовый маркер.  деловая документация">
+      <div class="page-topline">
+        <a class="page-number" href="#page-118">Стр. 118</a>
+        <span class="origin-section">Деловая документация</span>
+      </div>
+      <h3>Шаблон презентации / варианты титула</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает гибкость титульных слайдов.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Три титульных слайда с разными иллюстрациями, включая инверсный черный вариант.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-119" data-search="шаблон презентации / текстовые страницы показывает типы внутренних слайдов. внутренние слайды: профиль компании, перечень услуг, перечень объектов, структура компании.  деловая документация">
+      <div class="page-topline">
+        <a class="page-number" href="#page-119">Стр. 119</a>
+        <span class="origin-section">Деловая документация</span>
+      </div>
+      <h3>Шаблон презентации / текстовые страницы</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает типы внутренних слайдов.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Четыре миниатюры слайдов: текстовый профиль, услуги, список объектов, организационная схема.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-120" data-search="шаблон презентации / кейсы и продукт показывает страницы с кейсами, списками и изображениями. слайды для кейсов и продуктовых блоков: карточка объекта, список преимуществ, логотипы клиентов / партнеров, продуктовая фотография.  деловая документация">
+      <div class="page-topline">
+        <a class="page-number" href="#page-120">Стр. 120</a>
+        <span class="origin-section">Деловая документация</span>
+      </div>
+      <h3>Шаблон презентации / кейсы и продукт</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает страницы с кейсами, списками и изображениями.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Четыре миниатюры слайдов: список объектов с фото, продукт с фото, партнеры/логотипы, финальный слайд.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-121" data-search="шаблон презентации / коммерческий блок и контакты показывает дополнительные презентационные страницы и контакты. дополнительные страницы презентации: коммерческие условия, нормативные документы, контактный финал.  деловая документация">
+      <div class="page-topline">
+        <a class="page-number" href="#page-121">Стр. 121</a>
+        <span class="origin-section">Деловая документация</span>
+      </div>
+      <h3>Шаблон презентации / коммерческий блок и контакты</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает дополнительные презентационные страницы и контакты.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Миниатюры документов и финальный слайд с адресным блоком.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-122" data-search="адресный блок фиксирует компактный способ набора контактов и символ маркера. адресный блок. используется маркер  с кодом . структура: , , , , .  деловая документация">
+      <div class="page-topline">
+        <a class="page-number" href="#page-122">Стр. 122</a>
+        <span class="origin-section">Деловая документация</span>
+      </div>
+      <h3>Адресный блок</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Деловая документация</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Фиксирует компактный способ набора контактов и символ маркера.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="docs">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Светлая карточка с контактами и маркером.]</p>
+      </div>
+    </article>
+      </div>
+    </section>
+
+    <section class="brand-section" id="section-stickers" data-section="stickers">
+      <div class="section-hero">
+        <iframe src="../logo_txt_rott_01.html" style="position:absolute; inset:0; width:100%; height:100%; border:none; mix-blend-mode:screen; opacity:0.4; pointer-events:none;"></iframe>
+        <div class="section-hero-content">
+          <div class="section-index">Раздел 04</div>
+          <h2>Наклейки / навигационные и предупредительные носители</h2>
+          <p>Предупреждающие, навигационные, объектные и маркировочные наклейки.</p>
+          <div class="section-meta">
+            <span>стр. 068–125</span>
+            <span>particle system #4</span>
+          </div>
+        </div>
+      </div>
+
+      <details class="particle-prompt">
+        <summary>
+          <span>Фоновая система частиц: Наклейки / навигационные и предупредительные носители</span>
+          <button class="copy-prompt" type="button" data-copy-target="prompt-stickers">Скопировать промт</button>
+        </summary>
+        <pre id="prompt-stickers"><code>A quiet signal system for stickers, labels, and warning marks: particles form soft halos, small badge-like clusters, rounded rectangles, and minimal attention zones. The mood should be controlled and clear, not alarming: gentle pulses, compact modular signs, and subtle scanning motion that suggests visibility and identification. Cursor interaction should lightly activate nearby particles, creating a faint expanding ring around the cursor, then fading back into the calm field. Avoid aggressive flashing, high contrast, or distracting warning effects. The result should feel like a refined safety interface in a premium brand system.
+
+Prefer low particle velocity, low contrast, no flashing, no aggressive repulsion, and preserve a central quiet reading zone.</code></pre>
+      </details>
+
+      <div class="cards-grid">
+        
+    <article class="page-card" id="page-068" data-search="наклейки / видеонаблюдение и оборудование показывает предупреждающие и маркировочные наклейки. наклейка с надписью: . наклейка на оборудование: .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-068">Стр. 068</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Наклейки / видеонаблюдение и оборудование</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Наклейки / навигационные и предупредительные носители</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает предупреждающие и маркировочные наклейки.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="stickers">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Крупная треугольная предупреждающая наклейка и небольшая наклейка на оборудование.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-069" data-search="наклейки / объект показывает несколько форматов сообщения об объекте. наклейка с надписью: .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-069">Стр. 069</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Наклейки / объект</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Наклейки / навигационные и предупредительные носители</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает несколько форматов сообщения об объекте.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="stickers">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Шесть вариантов треугольных наклеек с разным знаком и фоном.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-070" data-search="наклейки / общий лист вариантов собирает разные наклейки на одной странице. варианты: , , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-070">Стр. 070</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Наклейки / общий лист вариантов</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Наклейки / навигационные и предупредительные носители</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Собирает разные наклейки на одной странице.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="stickers">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Несколько наклеек разного формата: широкая, квадратная, треугольная, прямоугольная.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-123" data-search="разделитель: наклейки открывает раздел предупредительных и маркировочных наклеек. наклейки.  наклейки">
+      <div class="page-topline">
+        <a class="page-number" href="#page-123">Стр. 123</a>
+        <span class="origin-section">Наклейки</span>
+      </div>
+      <h3>Разделитель: наклейки</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Наклейки / навигационные и предупредительные носители</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Открывает раздел предупредительных и маркировочных наклеек.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="stickers">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Черный разделительный слайд с диагональной сеткой.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-124" data-search="наклейка «объект ...» показывает вариативность сообщений для объекта. в зависимости от вида услуги / контроля может использоваться тот или иной тип наклеек. текст: .  наклейки">
+      <div class="page-topline">
+        <a class="page-number" href="#page-124">Стр. 124</a>
+        <span class="origin-section">Наклейки</span>
+      </div>
+      <h3>Наклейка «Объект ...»</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Наклейки / навигационные и предупредительные носители</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает вариативность сообщений для объекта.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="stickers">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Шесть треугольных наклеек с разными знаками и фонами.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-125" data-search="наклейка видеонаблюдения / на оборудование показывает крупное предупреждение и малую маркировку. наклейка с надписью . наклейка на оборудование: .  наклейки">
+      <div class="page-topline">
+        <a class="page-number" href="#page-125">Стр. 125</a>
+        <span class="origin-section">Наклейки</span>
+      </div>
+      <h3>Наклейка видеонаблюдения / на оборудование</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Наклейки / навигационные и предупредительные носители</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает крупное предупреждение и малую маркировку.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="stickers">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Крупная треугольная наклейка и маленький фирменный блок для оборудования.]</p>
+      </div>
+    </article>
+      </div>
+    </section>
+
+    <section class="brand-section" id="section-cars" data-section="cars">
+      <div class="section-hero">
+        <iframe src="../logo_txt_rott_01.html" style="position:absolute; inset:0; width:100%; height:100%; border:none; mix-blend-mode:screen; opacity:0.4; pointer-events:none;"></iframe>
+        <div class="section-hero-content">
+          <div class="section-index">Раздел 05</div>
+          <h2>Брендирование автомобилей</h2>
+          <p>Схемы нанесения айдентики на легковой автомобиль, средний автомобиль и микроавтобус.</p>
+          <div class="section-meta">
+            <span>стр. 071–131</span>
+            <span>particle system #5</span>
+          </div>
+        </div>
+      </div>
+
+      <details class="particle-prompt">
+        <summary>
+          <span>Фоновая система частиц: Брендирование автомобилей</span>
+          <button class="copy-prompt" type="button" data-copy-target="prompt-cars">Скопировать промт</button>
+        </summary>
+        <pre id="prompt-cars"><code>A slow aerodynamic flow field for vehicle branding: particles move like calm air streams along invisible car silhouettes, creating elegant motion lines, side-view contours, and soft perspective trails. The system should suggest movement, direction, and applied graphics on a moving surface without drawing an actual car. Use elongated waves, smooth parallax layers, and gently shifting bands that feel like reflective vinyl on a vehicle body. Cursor interaction should softly push the streamlines aside, as if the cursor creates a mild airflow disturbance. Keep the animation smooth, wide, horizontal, and unobtrusive behind content.
+
+Prefer low particle velocity, low contrast, no flashing, no aggressive repulsion, and preserve a central quiet reading zone.</code></pre>
+      </details>
+
+      <div class="cards-grid">
+        
+    <article class="page-card" id="page-071" data-search="брендирование автомобилей / вариант показывает обклейку автомобиля с плотным паттерном. брендирование автомобилей.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-071">Стр. 071</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Брендирование автомобилей / вариант</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Брендирование автомобилей</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает обклейку автомобиля с плотным паттерном.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="cars">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Фото / рендер микроавтобуса с полной боковой обклейкой, паттерном и логотипом.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-072" data-search="брендирование автомобилей / легковой автомобиль 1 показывает простой вариант обклейки легкового автомобиля. легковой автомобиль.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-072">Стр. 072</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Брендирование автомобилей / легковой автомобиль 1</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Брендирование автомобилей</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает простой вариант обклейки легкового автомобиля.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="cars">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Фото / рендер небольшого автомобиля: логотип на двери, подпись направления на нижней линии.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-073" data-search="брендирование автомобилей / легковой автомобиль 2 показывает боковой вид седана с фирменной обклейкой. легковой автомобиль.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-073">Стр. 073</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Брендирование автомобилей / легковой автомобиль 2</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Брендирование автомобилей</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает боковой вид седана с фирменной обклейкой.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="cars">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Фото / рендер седана сбоку: крупный логотип на двери и темная задняя часть.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-074" data-search="брендирование автомобилей / средний автомобиль показывает трехчетвертной вид автомобиля с логотипом. средний автомобиль.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-074">Стр. 074</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Брендирование автомобилей / средний автомобиль</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Брендирование автомобилей</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает трехчетвертной вид автомобиля с логотипом.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="cars">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Фото / рендер автомобиля в 3/4: логотип на двери и знак на номерной зоне.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-075" data-search="брендирование автомобилей / микроавтобус показывает фургон / микроавтобус с обклейкой. микроавтобус.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-075">Стр. 075</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Брендирование автомобилей / микроавтобус</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Брендирование автомобилей</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает фургон / микроавтобус с обклейкой.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="cars">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Фото / рендер микроавтобуса: крупный логотип на боковой панели и знак на передней части.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-126" data-search="разделитель: автомобили открывает раздел брендирования транспорта. брендирование автомобилей.  брендирование автомобилей">
+      <div class="page-topline">
+        <a class="page-number" href="#page-126">Стр. 126</a>
+        <span class="origin-section">Брендирование автомобилей</span>
+      </div>
+      <h3>Разделитель: автомобили</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Брендирование автомобилей</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Открывает раздел брендирования транспорта.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="cars">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Черный разделительный слайд с диагональной сеткой.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-127" data-search="легковой автомобиль / боковой вид показывает принцип размещения фирменной графики на транспорте. брендирование транспорта: . размещение логотипа, знака, дескриптора, паттерна и контактной информации фиксируется для повторяемости.  брендирование автомобилей">
+      <div class="page-topline">
+        <a class="page-number" href="#page-127">Стр. 127</a>
+        <span class="origin-section">Брендирование автомобилей</span>
+      </div>
+      <h3>Легковой автомобиль / боковой вид</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Брендирование автомобилей</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает принцип размещения фирменной графики на транспорте.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="cars">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Серое поле: фото автомобиля сбоку с брендированием. Логотип на двери, дескриптор на нижней линии.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-128" data-search="легковой автомобиль / передний ракурс показывает принцип размещения фирменной графики на транспорте. брендирование транспорта: . размещение логотипа, знака, дескриптора, паттерна и контактной информации фиксируется для повторяемости.  брендирование автомобилей">
+      <div class="page-topline">
+        <a class="page-number" href="#page-128">Стр. 128</a>
+        <span class="origin-section">Брендирование автомобилей</span>
+      </div>
+      <h3>Легковой автомобиль / передний ракурс</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Брендирование автомобилей</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает принцип размещения фирменной графики на транспорте.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="cars">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Серое поле: фото автомобиля 3/4 спереди с логотипом на двери и брендированным номером.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-129" data-search="средний автомобиль / боковой вид показывает принцип размещения фирменной графики на транспорте. брендирование транспорта: . размещение логотипа, знака, дескриптора, паттерна и контактной информации фиксируется для повторяемости.  брендирование автомобилей">
+      <div class="page-topline">
+        <a class="page-number" href="#page-129">Стр. 129</a>
+        <span class="origin-section">Брендирование автомобилей</span>
+      </div>
+      <h3>Средний автомобиль / боковой вид</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Брендирование автомобилей</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает принцип размещения фирменной графики на транспорте.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="cars">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Серое поле: фото седана сбоку с крупным логотипом и затемненной задней частью.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-130" data-search="средний автомобиль / передний ракурс показывает принцип размещения фирменной графики на транспорте. брендирование транспорта: . размещение логотипа, знака, дескриптора, паттерна и контактной информации фиксируется для повторяемости.  брендирование автомобилей">
+      <div class="page-topline">
+        <a class="page-number" href="#page-130">Стр. 130</a>
+        <span class="origin-section">Брендирование автомобилей</span>
+      </div>
+      <h3>Средний автомобиль / передний ракурс</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Брендирование автомобилей</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает принцип размещения фирменной графики на транспорте.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="cars">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Серое поле: фото седана 3/4 спереди с логотипом и фирменной плашкой на номере.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-131" data-search="микроавтобус показывает принцип размещения фирменной графики на транспорте. брендирование транспорта: . размещение логотипа, знака, дескриптора, паттерна и контактной информации фиксируется для повторяемости.  брендирование автомобилей">
+      <div class="page-topline">
+        <a class="page-number" href="#page-131">Стр. 131</a>
+        <span class="origin-section">Брендирование автомобилей</span>
+      </div>
+      <h3>Микроавтобус</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Брендирование автомобилей</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает принцип размещения фирменной графики на транспорте.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="cars">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Серое поле: фото микроавтобуса сбоку и сзади, крупный логотип на борту.]</p>
+      </div>
+    </article>
+      </div>
+    </section>
+
+    <section class="brand-section" id="section-uniform" data-section="uniform">
+      <div class="section-hero">
+        <iframe src="../logo_txt_rott_01.html" style="position:absolute; inset:0; width:100%; height:100%; border:none; mix-blend-mode:screen; opacity:0.4; pointer-events:none;"></iframe>
+        <div class="section-hero-content">
+          <div class="section-index">Раздел 06</div>
+          <h2>Форма сотрудников</h2>
+          <p>Шевроны, нашивки, футболки, бейджи и принципы нанесения на рабочую одежду.</p>
+          <div class="section-meta">
+            <span>стр. 076–137</span>
+            <span>particle system #6</span>
+          </div>
+        </div>
+      </div>
+
+      <details class="particle-prompt">
+        <summary>
+          <span>Фоновая система частиц: Форма сотрудников</span>
+          <button class="copy-prompt" type="button" data-copy-target="prompt-uniform">Скопировать промт</button>
+        </summary>
+        <pre id="prompt-uniform"><code>A textile-inspired particle system for employee uniforms: particles create a calm woven structure, subtle fabric grain, seam-like paths, and soft emblem placement zones. The motion should feel tactile and disciplined: small points move in interlaced waves, forming quiet grids, diagonal threads, and patch-like clusters. Cursor interaction should slightly lift and deform the weave around the pointer, like a gentle touch on fabric, then smoothly restore the pattern. The design must remain understated, structured, and premium, with muted grayscale tones and no distracting movement near the text area.
+
+Prefer low particle velocity, low contrast, no flashing, no aggressive repulsion, and preserve a central quiet reading zone.</code></pre>
+      </details>
+
+      <div class="cards-grid">
+        
+    <article class="page-card" id="page-076" data-search="форма сотрудников / шевроны вариант #1 показывает размещение шевронов / нашивок на форме. шевроны / нашивки, вариант #1.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-076">Стр. 076</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Форма сотрудников / шевроны вариант #1</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Форма сотрудников</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает размещение шевронов / нашивок на форме.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="uniform">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Фото сотрудника спереди и сзади. На спине крупная надпись роли, на груди логотип / шеврон.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-077" data-search="форма сотрудников / шевроны вариант #2 показывает альтернативное размещение шевронов. шевроны / нашивки, вариант #2.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-077">Стр. 077</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Форма сотрудников / шевроны вариант #2</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Форма сотрудников</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает альтернативное размещение шевронов.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="uniform">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Фото сотрудника спереди и сзади, другая форма нагрудной нашивки.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-078" data-search="форма сотрудников / шевроны вариант #3 показывает третий вариант формы и маркировки. шевроны / нашивки, вариант #3.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-078">Стр. 078</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Форма сотрудников / шевроны вариант #3</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Форма сотрудников</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает третий вариант формы и маркировки.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="uniform">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Фото сотрудника спереди и сзади с дополнительной графикой.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-079" data-search="форма сотрудников / футболка показывает футболки с текстовой и паттерновой графикой. футболка.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-079">Стр. 079</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Форма сотрудников / футболка</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Форма сотрудников</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает футболки с текстовой и паттерновой графикой.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="uniform">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Две фотографии модели в футболке: белая версия с надписью роли и темная версия с фирменным паттерном.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-080" data-search="форма сотрудников / бейдж показывает бейдж и его использование на одежде. бейдж: , .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-080">Стр. 080</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Форма сотрудников / бейдж</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Форма сотрудников</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает бейдж и его использование на одежде.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="uniform">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Мокап бейджа и фото сотрудника с бейджем на груди.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-132" data-search="разделитель: форма сотрудников открывает раздел униформы и персональных идентификаторов. форма сотрудников.  форма сотрудников">
+      <div class="page-topline">
+        <a class="page-number" href="#page-132">Стр. 132</a>
+        <span class="origin-section">Форма сотрудников</span>
+      </div>
+      <h3>Разделитель: форма сотрудников</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Форма сотрудников</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Открывает раздел униформы и персональных идентификаторов.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="uniform">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Черный разделительный слайд с диагональной сеткой.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-133" data-search="футболка показывает базовую и темную футболку. футболка. варианты: светлая версия с текстом  и темная версия с фирменным паттерном / знаком.  форма сотрудников">
+      <div class="page-topline">
+        <a class="page-number" href="#page-133">Стр. 133</a>
+        <span class="origin-section">Форма сотрудников</span>
+      </div>
+      <h3>Футболка</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Форма сотрудников</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает базовую и темную футболку.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="uniform">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Две фотографии модели в футболках. Заменить на серые поля: &quot;модель в светлой футболке&quot;, &quot;модель в темной футболке&quot;.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-134" data-search="бейдж показывает бейдж и размещение на одежде. бейдж: , . указывается вариант на темном фоне и пример размещения на форме.  форма сотрудников">
+      <div class="page-topline">
+        <a class="page-number" href="#page-134">Стр. 134</a>
+        <span class="origin-section">Форма сотрудников</span>
+      </div>
+      <h3>Бейдж</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Форма сотрудников</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает бейдж и размещение на одежде.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="uniform">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Мокап бейджа и фото сотрудника с бейджем на одежде.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-135" data-search="шевроны / нашивки / охрана показывает форму для основной категории сотрудников. шевроны / нашивки (). размещение: спина, грудь, рукав / дополнительный знак.  форма сотрудников">
+      <div class="page-topline">
+        <a class="page-number" href="#page-135">Стр. 135</a>
+        <span class="origin-section">Форма сотрудников</span>
+      </div>
+      <h3>Шевроны / нашивки / охрана</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Форма сотрудников</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает форму для основной категории сотрудников.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="uniform">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Две фотографии сотрудника: вид сзади с крупной надписью роли и вид спереди с нашивками.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-136" data-search="шевроны / нашивки / группа быстрого реагирования показывает отдельное оформление для мобильной / оперативной группы. шевроны / нашивки ().  форма сотрудников">
+      <div class="page-topline">
+        <a class="page-number" href="#page-136">Стр. 136</a>
+        <span class="origin-section">Форма сотрудников</span>
+      </div>
+      <h3>Шевроны / нашивки / группа быстрого реагирования</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Форма сотрудников</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает отдельное оформление для мобильной / оперативной группы.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="uniform">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Серое поле: форма сотрудника с отдельной маркировкой подразделения.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-137" data-search="шевроны / нашивки / монтажники показывает отдельное оформление для технической группы. шевроны / нашивки ().  форма сотрудников">
+      <div class="page-topline">
+        <a class="page-number" href="#page-137">Стр. 137</a>
+        <span class="origin-section">Форма сотрудников</span>
+      </div>
+      <h3>Шевроны / нашивки / монтажники</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Форма сотрудников</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает отдельное оформление для технической группы.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="uniform">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Серое поле: форма сотрудника с технической маркировкой.]</p>
+      </div>
+    </article>
+      </div>
+    </section>
+
+    <section class="brand-section" id="section-merch" data-section="merch">
+      <div class="section-hero">
+        <iframe src="../logo_txt_rott_01.html" style="position:absolute; inset:0; width:100%; height:100%; border:none; mix-blend-mode:screen; opacity:0.4; pointer-events:none;"></iframe>
+        <div class="section-hero-content">
+          <div class="section-index">Раздел 07</div>
+          <h2>Сувенирная продукция</h2>
+          <p>Пакеты, кружки, ручки, карандаши, флэшки и малые брендированные носители.</p>
+          <div class="section-meta">
+            <span>стр. 081–142</span>
+            <span>particle system #7</span>
+          </div>
+        </div>
+      </div>
+
+      <details class="particle-prompt">
+        <summary>
+          <span>Фоновая система частиц: Сувенирная продукция</span>
+          <button class="copy-prompt" type="button" data-copy-target="prompt-merch">Скопировать промт</button>
+        </summary>
+        <pre id="prompt-merch"><code>A soft material constellation for branded merchandise: particles should suggest objects, surfaces, and tactile details without drawing literal products. Create calm circular flows for mugs, linear traces for pens, small rectangular clusters for packaging, and tiny suspended points like dust on matte material. The system should feel pleasant, warm, and collectible, with slow floating motion and gentle transitions between product-like silhouettes. Cursor interaction should attract nearby particles slightly, as if the cursor is presenting or rotating a small object in space, then release them smoothly. Keep the style minimal, premium, and friendly.
+
+Prefer low particle velocity, low contrast, no flashing, no aggressive repulsion, and preserve a central quiet reading zone.</code></pre>
+      </details>
+
+      <div class="cards-grid">
+        
+    <article class="page-card" id="page-081" data-search="сувенирная продукция / полиэтиленовый пакет показывает два варианта пакета. пакет полиэтиленовый.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-081">Стр. 081</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Сувенирная продукция / полиэтиленовый пакет</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Сувенирная продукция</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает два варианта пакета.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="merch">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Два пакета: светлый с логотипом, темный с паттерном.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-082" data-search="сувенирная продукция / бумажный пакет показывает праздничные / тематические варианты пакетов. подарочный / бумажный пакет.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-082">Стр. 082</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Сувенирная продукция / бумажный пакет</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Сувенирная продукция</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает праздничные / тематические варианты пакетов.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="merch">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Три бумажных пакета с ручками: с вертикальными модулями, с паттерном, с цветной тематической гирляндой.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-083" data-search="сувенирная продукция / кружка показывает кружки с логотипом и паттернами. кружка. нанесение: .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-083">Стр. 083</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Сувенирная продукция / кружка</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Сувенирная продукция</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает кружки с логотипом и паттернами.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="merch">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Несколько кружек: светлая, темная, с паттерном, с крупным логотипом.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-084" data-search="сувенирная продукция / ручка, карандаш, флэшка показывает малые сувениры. ручка / карандаш / флэшка. варианты нанесения: логотип, паттерн, форма изделия под символ.  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-084">Стр. 084</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Сувенирная продукция / ручка, карандаш, флэшка</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Сувенирная продукция</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает малые сувениры.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="merch">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Группа сувениров: флэшка прямоугольная, флэшка в форме символа, карандаш, ручка.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-085" data-search="кредитная страница закрывает id-блок. разработано в .  id / деловая документация и носители">
+      <div class="page-topline">
+        <a class="page-number" href="#page-085">Стр. 085</a>
+        <span class="origin-section">ID / деловая документация и носители</span>
+      </div>
+      <h3>Кредитная страница</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Сувенирная продукция</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Закрывает ID-блок.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="merch">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Черный фон, тонкие линии, малая подпись.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-138" data-search="разделитель: сувенирная продукция открывает раздел сувенирных и подарочных носителей. сувенирная продукция.  сувенирная продукция">
+      <div class="page-topline">
+        <a class="page-number" href="#page-138">Стр. 138</a>
+        <span class="origin-section">Сувенирная продукция</span>
+      </div>
+      <h3>Разделитель: сувенирная продукция</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Сувенирная продукция</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Открывает раздел сувенирных и подарочных носителей.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="merch">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Черный разделительный слайд с диагональной сеткой.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-139" data-search="пакет бумажный показывает праздничные / тематические бумажные пакеты. в зависимости от праздника или коммуникационной задачи из элементов фирменной графики может быть разработана тематическая графика.  сувенирная продукция">
+      <div class="page-topline">
+        <a class="page-number" href="#page-139">Стр. 139</a>
+        <span class="origin-section">Сувенирная продукция</span>
+      </div>
+      <h3>Пакет бумажный</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Сувенирная продукция</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает праздничные / тематические бумажные пакеты.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="merch">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Три бумажных пакета с ручками: модульный знак, паттерн, цветной тематический орнамент.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-140" data-search="пакет полиэтиленовый показывает светлый и темный полиэтиленовый пакет. пакет полиэтиленовый.  сувенирная продукция">
+      <div class="page-topline">
+        <a class="page-number" href="#page-140">Стр. 140</a>
+        <span class="origin-section">Сувенирная продукция</span>
+      </div>
+      <h3>Пакет полиэтиленовый</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Сувенирная продукция</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает светлый и темный полиэтиленовый пакет.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="merch">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Два пакета: светлый с логотипом и темный с крупным паттерном.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-141" data-search="ручка / карандаш / флэшка показывает малые сувениры и нанесение. ручка / карандаш / флэшка. возможны варианты: флэшка с паттерном, флэшка в форме фирменного символа, карандаш, ручка.  сувенирная продукция">
+      <div class="page-topline">
+        <a class="page-number" href="#page-141">Стр. 141</a>
+        <span class="origin-section">Сувенирная продукция</span>
+      </div>
+      <h3>Ручка / карандаш / флэшка</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Сувенирная продукция</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает малые сувениры и нанесение.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="merch">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Серое поле: набор малых сувениров с логотипом и паттерном.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-142" data-search="кружка показывает кружки с логотипом и паттерном. классическая кружка с логотипом и кружки со специальным нанесением: ,  или другая технология.  сувенирная продукция">
+      <div class="page-topline">
+        <a class="page-number" href="#page-142">Стр. 142</a>
+        <span class="origin-section">Сувенирная продукция</span>
+      </div>
+      <h3>Кружка</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Сувенирная продукция</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает кружки с логотипом и паттерном.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="merch">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Серое поле: набор кружек с логотипом, инверсией и паттернами.]</p>
+      </div>
+    </article>
+      </div>
+    </section>
+
+    <section class="brand-section" id="section-ads" data-section="ads">
+      <div class="section-hero">
+        <iframe src="../logo_txt_rott_01.html" style="position:absolute; inset:0; width:100%; height:100%; border:none; mix-blend-mode:screen; opacity:0.4; pointer-events:none;"></iframe>
+        <div class="section-hero-content">
+          <div class="section-index">Раздел 08</div>
+          <h2>Рекламные материалы и вывеска</h2>
+          <p>Рекламные модули, листовки, фасадная и интерьерная вывеска.</p>
+          <div class="section-meta">
+            <span>стр. 143–148</span>
+            <span>particle system #8</span>
+          </div>
+        </div>
+      </div>
+
+      <details class="particle-prompt">
+        <summary>
+          <span>Фоновая система частиц: Рекламные материалы и фасад</span>
+          <button class="copy-prompt" type="button" data-copy-target="prompt-ads">Скопировать промт</button>
+        </summary>
+        <pre id="prompt-ads"><code>An architectural light-grid particle system for advertising materials and facade signage: particles form large-scale planes, modular facade grids, illuminated sign zones, and calm perspective depth. The mood should feel public, confident, and spatial: soft points drift across an invisible building surface, occasionally aligning into signage bands and media-format rectangles. Cursor interaction should create a very subtle light falloff, as if the pointer is a soft spotlight moving across a facade, gently brightening nearby particles without glare. Keep the animation slow, spacious, elegant, and suitable as a background for reading.
+
+Prefer low particle velocity, low contrast, no flashing, no aggressive repulsion, and preserve a central quiet reading zone.</code></pre>
+      </details>
+
+      <div class="cards-grid">
+        
+    <article class="page-card" id="page-143" data-search="разделитель: рекламные материалы и вывеска открывает раздел рекламных модулей и фасадной айдентики. рекламные материалы и вывеска.  рекламные материалы и вывеска">
+      <div class="page-topline">
+        <a class="page-number" href="#page-143">Стр. 143</a>
+        <span class="origin-section">Рекламные материалы и вывеска</span>
+      </div>
+      <h3>Разделитель: рекламные материалы и вывеска</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Рекламные материалы и вывеска</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Открывает раздел рекламных модулей и фасадной айдентики.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="ads">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Черный разделительный слайд с диагональной сеткой.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-144" data-search="рекламный модуль в сми / 85 x 85 мм показывает модульную сетку рекламного объявления. рекламный модуль в сми: 85 x 85 мм. состав: логотип, слоган, фото или иллюстрация, адресный блок, телефон, сайт.  рекламные материалы и вывеска">
+      <div class="page-topline">
+        <a class="page-number" href="#page-144">Стр. 144</a>
+        <span class="origin-section">Рекламные материалы и вывеска</span>
+      </div>
+      <h3>Рекламный модуль в СМИ / 85 x 85 мм</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Рекламные материалы и вывеска</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает модульную сетку рекламного объявления.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="ads">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Серое поле: малый рекламный модуль. Слева/сверху логотип, в центре фото/иллюстрация, снизу контактный блок и слоган.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-145" data-search="рекламный модуль в сми / 120 x 175 мм показывает модульную сетку рекламного объявления. рекламный модуль в сми: 120 x 175 мм. состав: логотип, слоган, фото или иллюстрация, адресный блок, телефон, сайт.  рекламные материалы и вывеска">
+      <div class="page-topline">
+        <a class="page-number" href="#page-145">Стр. 145</a>
+        <span class="origin-section">Рекламные материалы и вывеска</span>
+      </div>
+      <h3>Рекламный модуль в СМИ / 120 x 175 мм</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Рекламные материалы и вывеска</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает модульную сетку рекламного объявления.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="ads">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Серое поле: средний рекламный модуль. Слева/сверху логотип, в центре фото/иллюстрация, снизу контактный блок и слоган.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-146" data-search="рекламный модуль a4 показывает полноформатное объявление / листовку. рекламный модуль a4. состав: крупный заголовок, текст о компании, список направлений / услуг, фото автомобиля или продукта, адресный блок.  рекламные материалы и вывеска">
+      <div class="page-topline">
+        <a class="page-number" href="#page-146">Стр. 146</a>
+        <span class="origin-section">Рекламные материалы и вывеска</span>
+      </div>
+      <h3>Рекламный модуль A4</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Рекламные материалы и вывеска</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает полноформатное объявление / листовку.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="ads">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Серое поле: лист A4 с текстовым блоком, колонками услуг, фото продукта/автомобиля и контактами.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-147" data-search="вывеска показывает фасадную и интерьерную вывеску. вывеска. форматы: фасад , вывеска внутри помещения. возможны объемные буквы без подложки и световой короб / панель.  рекламные материалы и вывеска">
+      <div class="page-topline">
+        <a class="page-number" href="#page-147">Стр. 147</a>
+        <span class="origin-section">Рекламные материалы и вывеска</span>
+      </div>
+      <h3>Вывеска</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Рекламные материалы и вывеска</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Показывает фасадную и интерьерную вывеску.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="ads">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Серое поле: фасадная вывеска с логотипом на темной плашке и отдельно вариант объемных букв.]</p>
+      </div>
+    </article>
+
+    <article class="page-card" id="page-148" data-search="кредитная страница финального руководства закрывающая страница руководства с указанием разработчика. разработано в .  рекламные материалы и вывеска">
+      <div class="page-topline">
+        <a class="page-number" href="#page-148">Стр. 148</a>
+        <span class="origin-section">Рекламные материалы и вывеска</span>
+      </div>
+      <h3>Кредитная страница финального руководства</h3>
+      <dl class="page-fields">
+        <div>
+          <dt>Раздел</dt>
+          <dd>Рекламные материалы и вывеска</dd>
+        </div>
+        <div>
+          <dt>Назначение страницы</dt>
+          <dd>Закрывающая страница руководства с указанием разработчика.</dd>
+        </div>
+        
+      </dl>
+      <div class="visual-placeholder" data-kind="ads">
+        <div class="visual-kicker">Визуал / плейсхолдеры</div>
+        <p>[Черный фон, тонкие диагональные линии, малая подпись внизу.]</p>
+      </div>
+    </article>
+      </div>
+    </section>
+
+      <footer class="footer" style="text-align: center; border-top: none; padding-top: 40px;">
+        <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" style="background: var(--line); border: none; color: var(--text); padding: 12px 24px; border-radius: 20px; cursor: pointer; font-family: var(--sans); font-size: 14px; transition: background 0.3s;" onmouseover="this.style.background='var(--line2)'" onmouseout="this.style.background='var(--line)'">↑ Вернуться вверх</button>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    (function() {
+      const input = document.getElementById('searchInput');
+      const cards = Array.from(document.querySelectorAll('.page-card'));
+      const sections = Array.from(document.querySelectorAll('.brand-section'));
+      const visiblePages = document.getElementById('visiblePages');
+
+      function applySearch() {
+        const q = (input.value || '').trim().toLowerCase();
+        let count = 0;
+        cards.forEach(card => {
+          const ok = !q || card.dataset.search.indexOf(q) !== -1;
+          card.classList.toggle('hidden-by-search', !ok);
+          if (ok) count++;
+        });
+        sections.forEach(sec => {
+          const hasVisible = Array.from(sec.querySelectorAll('.page-card')).some(card => !card.classList.contains('hidden-by-search'));
+          sec.classList.toggle('hidden-by-search', !hasVisible && q);
+        });
+        visiblePages.textContent = String(count);
+      }
+      input.addEventListener('input', applySearch);
+
+      document.querySelectorAll('.copy-prompt').forEach(btn => {
+        btn.addEventListener('click', async (event) => {
+          event.preventDefault();
+          const targetId = btn.getAttribute('data-copy-target');
+          const node = document.getElementById(targetId);
+          const text = node ? node.innerText : '';
+          try {
+            await navigator.clipboard.writeText(text);
+            const old = btn.textContent;
+            btn.textContent = 'Скопировано';
+            setTimeout(() => btn.textContent = old, 1100);
+          } catch (e) {
+            btn.textContent = 'Выделите вручную';
+          }
+        });
+      });
+
+      const canvases = Array.from(document.querySelectorAll('.particle-canvas'));
+      const systems = canvases.map((canvas, idx) => {
+        const ctx = canvas.getContext('2d');
+        const kind = Number(canvas.dataset.kind || idx);
+        const particles = ;
+        const total = 96;
+        for (let i = 0; i < total; i++) {
+          particles.push({
+            seed: i * 19.19 + kind * 101.7,
+            x: 0,
+            y: 0,
+            s: .6 + ((i * 7) % 11) / 18,
+            phase: (i * .618 + kind) * Math.PI
+          });
+        }
+        return { canvas, ctx, kind, particles, mouseX: .5, mouseY: .5, active: false, visible: true, w: 1, h: 1 };
+      });
+
+      function resize() {
+        systems.forEach(sys => {
+          const r = sys.canvas.getBoundingClientRect();
+          const dpr = Math.min(2, window.devicePixelRatio || 1);
+          sys.w = Math.max(1, r.width);
+          sys.h = Math.max(1, r.height);
+          sys.canvas.width = Math.floor(sys.w * dpr);
+          sys.canvas.height = Math.floor(sys.h * dpr);
+          sys.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        });
+      }
+
+      window.addEventListener('resize', resize);
+      resize();
+
+      systems.forEach(sys => {
+        sys.canvas.addEventListener('pointermove', e => {
+          const r = sys.canvas.getBoundingClientRect();
+          sys.mouseX = (e.clientX - r.left) / Math.max(1, r.width);
+          sys.mouseY = (e.clientY - r.top) / Math.max(1, r.height);
+          sys.active = true;
+        });
+        sys.canvas.addEventListener('pointerleave', () => sys.active = false);
+      });
+
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          const sys = systems.find(s => s.canvas === entry.target);
+          if (sys) sys.visible = entry.isIntersecting;
+        });
+      }, { rootMargin: '160px' });
+      systems.forEach(sys => io.observe(sys.canvas));
+
+      function basePos(kind, i, t, w, h) {
+        const u = i / 95;
+        const a = i * 2.399963 + kind * .31;
+        let x = 0, y = 0;
+
+        if (kind === 0) {
+          const r = Math.sqrt(u) * .42 + Math.sin(t*.25 + i)*.015;
+          x = .5 + Math.cos(a + t*.08) * r;
+          y = .5 + Math.sin(a*1.17 - t*.06) * r * .72;
+        } else if (kind === 1) {
+          const col = i % 12;
+          const row = Math.floor(i / 12);
+          x = .12 + col * .07 + Math.sin(t*.35 + row) * .012;
+          y = .16 + row * .085 + Math.cos(t*.28 + col) * .012;
+        } else if (kind === 2) {
+          x = .08 + u * .84;
+          y = .22 + ((i * 17) % 60) / 100 + Math.sin(t*.22 + i*.41) * .018;
+        } else if (kind === 3) {
+          const ring = .16 + ((i % 4) * .06);
+          x = .5 + Math.cos(a + Math.sin(t*.2)*.2) * ring * (1 + Math.sin(t*.7 + i)*.03);
+          y = .5 + Math.sin(a) * ring * .72;
+        } else if (kind === 4) {
+          x = .04 + u * .92;
+          y = .5 + Math.sin(u*9.4 + t*.45 + (i%5)) * (.08 + (i%4)*.018);
+        } else if (kind === 5) {
+          const col = i % 16;
+          const row = Math.floor(i / 16);
+          x = .08 + col * .058 + Math.sin(t*.25 + row*.7) * .01;
+          y = .16 + row * .105 + Math.sin((col+row)*.8 + t*.32) * .016;
+        } else if (kind === 6) {
+          const cluster = i % 3;
+          const cx = [.32, .52, .68][cluster];
+          const cy = [.48, .42, .58][cluster];
+          const rr = .05 + ((i % 17) / 17) * .13;
+          x = cx + Math.cos(a + t*.18) * rr;
+          y = cy + Math.sin(a - t*.12) * rr * .72;
+        } else {
+          const col = i % 14;
+          const row = Math.floor(i / 14);
+          x = .10 + col * .065 + Math.sin(t*.18 + row) * .008;
+          y = .16 + row * .095 + Math.cos(t*.2 + col) * .008;
+        }
+
+        return [x * w, y * h];
+      }
+
+      function animate(now) {
+        const t = now / 1000;
+        systems.forEach(sys => {
+          if (!sys.visible) return;
+          const ctx = sys.ctx;
+          const w = sys.w;
+          const h = sys.h;
+          ctx.clearRect(0, 0, w, h);
+          ctx.fillStyle = 'rgba(255,255,255,0.018)';
+          ctx.fillRect(0, 0, w, h);
+
+          const mx = sys.mouseX * w;
+          const my = sys.mouseY * h;
+          const influence = sys.active ? 1 : .18;
+
+          ctx.lineWidth = 1;
+          for (let i = 0; i < sys.particles.length; i++) {
+            const p = sys.particles[i];
+            const pos = basePos(sys.kind, i, t + p.phase*.01, w, h);
+            let x = pos[0];
+            let y = pos[1];
+            const dx = x - mx;
+            const dy = y - my;
+            const d2 = dx*dx + dy*dy + 80;
+            const force = Math.min(34, 2100 / d2) * influence;
+            x += dx * force * .018;
+            y += dy * force * .018;
+            p.x = x;
+            p.y = y;
+
+            const alpha = .22 + Math.sin(t*.8 + p.phase) * .08;
+            ctx.beginPath();
+            ctx.fillStyle = 'rgba(242,240,234,' + Math.max(.08, alpha).toFixed(3) + ')';
+            ctx.arc(x, y, p.s, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          ctx.strokeStyle = 'rgba(215,255,115,0.055)';
+          const step = sys.kind === 4 ? 2 : 7;
+          for (let i = 0; i < sys.particles.length - step; i += step) {
+            const a = sys.particles[i];
+            const b = sys.particles[i + step];
+            const dx = a.x - b.x;
+            const dy = a.y - b.y;
+            const dist = dx*dx + dy*dy;
+            if (dist < 15000) {
+              ctx.beginPath();
+              ctx.moveTo(a.x, a.y);
+              ctx.lineTo(b.x, b.y);
+              ctx.stroke();
+            }
+          }
+
+          if (sys.active) {
+            const r = 34 + Math.sin(t*2) * 4;
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(141,215,255,0.12)';
+            ctx.arc(mx, my, r, 0, Math.PI*2);
+            ctx.stroke();
+          }
+        });
+        requestAnimationFrame(animate);
+      }
+      requestAnimationFrame(animate);
+    })();
+  </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const sections = document.querySelectorAll('.brand-section');
+    const colors = ['#d7ff73', '#8dd7ff', '#ff8a72', '#a872ff', '#ff72a8', '#72ffb8', '#ffe472', '#72c2ff'];
+    sections.forEach((sec, i) => {
+        const color = colors[i % colors.length];
+        const cards = sec.querySelectorAll('.page-card');
+        cards.forEach(card => {
+            card.style.borderTop = '3px solid ' + color;
+        });
+    });
+});
+
+window.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'navigate') {
+        const target = document.querySelector(event.data.hash);
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+});
+</script>
+</body>
+</html>
