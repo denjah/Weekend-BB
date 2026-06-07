@@ -1,942 +1,1257 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Weekend Billiard — Корпоративный Брендбук. Полное руководство по визуальной идентичности, стандартам и применению бренда.">
+  <meta name="description"
+    content="Weekend Billiard — Корпоративный Брендбук. Полное руководство по визуальной идентичности, стандартам и применению бренда.">
   <title>Weekend Billiard — Brandbook</title>
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="stylesheet" href="styles/tokens.css">
   <link rel="stylesheet" href="styles/global.css">
+  <!-- GSAP -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js" defer></script>
+  <!-- Script Modules -->
+  <script src="js/upload.js" defer></script>
+  <script src="js/comments.js" defer></script>
+  <script src="js/logobook-data.js" defer></script>
+  <!-- Statistics Engine -->
+  <script src="js/stats.js" defer></script>
+  <!-- GSAP Animations -->
+  <script src="js/animations.js" defer></script>
+  <script>
+    // Theme init — before render to avoid FOUC
+    (function () {
+      const saved = localStorage.getItem('wb-theme') || 'light';
+      document.documentElement.setAttribute('data-theme', saved);
+    })();
+  </script>
 </head>
+
 <body class="particles-hidden">
 
-<div class="app-layout">
+  <div class="app-layout">
 
-  <!-- ════════════════ SIDEBAR ════════════════ -->
-  <aside class="app-sidebar" id="sidebar">
-    <div class="sidebar-brand">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 458.78" style="width: 48px; height: 48px;">
-        <defs>
-          <linearGradient id="grad-icon" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#1B2B5A" />
-            <stop offset="100%" stop-color="#4facfe" />
-          </linearGradient>
-        </defs>
-        <g fill="url(#grad-icon)">
-          <circle cx="633.82" cy="66.18" r="66.18"/>
-          <polygon points="459.67 0 611.89 266.92 527.44 458.78 263.19 0 459.67 0"/>
-          <polygon points="196.48 0 348.71 266.92 264.25 458.78 0 0 196.48 0"/>
-        </g>
-      </svg>
-      <div class="sidebar-brand-text">
-        <small>Brandbook 2026</small>
+    <!-- ════════════════ SIDEBAR ════════════════ -->
+    <aside class="app-sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 458.78" style="width: 48px; height: 48px;">
+          <defs>
+            <linearGradient id="grad-icon" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#1B2B5A" />
+              <stop offset="100%" stop-color="#4facfe" />
+            </linearGradient>
+          </defs>
+          <g fill="url(#grad-icon)">
+            <circle cx="633.82" cy="66.18" r="66.18" />
+            <polygon points="459.67 0 611.89 266.92 527.44 458.78 263.19 0 459.67 0" />
+            <polygon points="196.48 0 348.71 266.92 264.25 458.78 0 0 196.48 0" />
+          </g>
+        </svg>
+        <div class="sidebar-brand-text">
+          <small>Brandbook 2026</small>
+        </div>
       </div>
-    </div>
-    
-    <div class="sidebar-stats">
-      <div class="sidebar-search">
-        <span style="color: var(--color-text-tertiary);">⌕</span>
-        <input type="text" placeholder="Поиск по брендбуку..." id="sidebarSearch" onkeyup="handleSearch(this.value)">
-      </div>
-      
-      <div class="stat-widget">
-        <div class="stat-widget-header">Прогресс заполнения</div>
-        <div class="stat-flex">
-          <div class="pie-chart" style="background: conic-gradient(#1B2B5A 0% 3%, #e0e0e0 3% 100%);"></div>
-          <div class="stat-numbers">
-            <div class="big-num">3%</div>
-            <div class="small-text">Общая готовность</div>
+
+      <div class="sidebar-stats">
+        <div class="sidebar-search">
+          <span style="color: var(--color-text-tertiary);">⌕</span>
+          <input type="text" placeholder="Поиск по брендбуку..." id="sidebarSearch" onkeyup="handleSearch(this.value)">
+        </div>
+
+        <div class="stat-widget">
+          <div class="stat-widget-header">Прогресс заполнения</div>
+          <div class="stat-flex">
+            <div class="pie-chart" style="background: conic-gradient(#1B2B5A 0% 3%, #e0e0e0 3% 100%);"></div>
+            <div class="stat-numbers">
+              <div class="big-num">3%</div>
+              <div class="small-text">Общая готовность</div>
+            </div>
+          </div>
+
+          <div class="progress-row" id="statRowText">
+            <div class="progress-label"><span>Текстовые блоки</span> <span class="val">0/0</span></div>
+            <div class="progress-bar">
+              <div class="progress-bar-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <div class="progress-row" id="statRowVisual">
+            <div class="progress-label"><span>Визуалы и макеты</span> <span class="val">0/0</span></div>
+            <div class="progress-bar">
+              <div class="progress-bar-fill" style="width: 0%; background: #4facfe;"></div>
+            </div>
+          </div>
+
+          <div class="progress-row" id="statRowTokens">
+            <div class="progress-label"><span>Загружено файлов</span> <span class="val" style="font-weight:700;">0</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-bar-fill" style="width: 0%; background: var(--color-accent-gold);"></div>
+            </div>
           </div>
         </div>
-        
-        <div class="progress-row">
-          <div class="progress-label"><span>Текстовые блоки</span> <span>3/60</span></div>
-          <div class="progress-bar"><div class="progress-bar-fill" style="width: 5%;"></div></div>
-        </div>
-        
-        <div class="progress-row">
-          <div class="progress-label"><span>Визуалы и макеты</span> <span>1/45</span></div>
-          <div class="progress-bar"><div class="progress-bar-fill" style="width: 2%; background: #4facfe;"></div></div>
-        </div>
 
-        <div class="progress-row">
-          <div class="progress-label"><span>Токинизировано документов</span> <span style="font-weight:700;">2</span></div>
-          <div class="progress-bar"><div class="progress-bar-fill" style="width: 100%; background: var(--color-accent-gold);"></div></div>
-        </div>
-      </div>
-      
-      <div class="stat-widget">
-        <div class="stat-widget-header">По разделам</div>
-        <div class="bar-chart">
-          <div class="bar"><div class="bar-fill" style="height: 100%; background: var(--ch1-brand-identity);"></div><div class="bar-label">01</div></div>
-          <div class="bar"><div class="bar-fill" style="height: 80%; background: var(--ch2-visual-system);"></div><div class="bar-label">02</div></div>
-          <div class="bar"><div class="bar-fill" style="height: 60%; background: var(--ch3-logo);"></div><div class="bar-label">03</div></div>
-          <div class="bar"><div class="bar-fill" style="height: 30%; background: var(--ch4-marketing);"></div><div class="bar-label">04</div></div>
-          <div class="bar"><div class="bar-fill" style="height: 90%; background: var(--ch5-corporate);"></div><div class="bar-label">05</div></div>
-          <div class="bar"><div class="bar-fill" style="height: 10%; background: var(--ch6-digital);"></div><div class="bar-label">06</div></div>
-          <div class="bar"><div class="bar-fill" style="height: 40%; background: var(--ch7-physical);"></div><div class="bar-label">07</div></div>
-          <div class="bar"><div class="bar-fill" style="height: 100%; background: var(--ch8-resources);"></div><div class="bar-label">08</div></div>
-        </div>
-      </div>
-    </div>
-
-    <nav class="sidebar-nav" id="sidebarNav">
-
-      <div class="nav-section">
-        <a class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
-          <span class="nav-dot" style="background: var(--color-accent-gold);"></span>
-          Главная
-        </a>
-      </div>
-
-      <!-- Ch.1 Brand Identity -->
-      <div class="nav-section">
-        <span class="nav-section-title">Основа</span>
-        <a class="nav-item" data-page="brand-identity" onclick="navigateTo('brand-identity')" style="--chapter-color: var(--ch1-brand-identity); --chapter-color-dim: var(--ch1-dim);">
-          <span class="nav-dot"></span>
-          1. Brand Identity
-        </a>
-      </div>
-
-      <!-- Ch.2 Visual System -->
-      <div class="nav-section">
-        <span class="nav-section-title">Дизайн-система</span>
-        <a class="nav-item" data-page="visual-system" onclick="navigateTo('visual-system')" style="--chapter-color: var(--ch2-visual-system); --chapter-color-dim: var(--ch2-dim);">
-          <span class="nav-dot"></span>
-          2. Visual System
-        </a>
-      </div>
-
-      <!-- Ch.3 Logo & Usage -->
-      <div class="nav-section has-submenu">
-        <a class="nav-item" data-page="logo-usage" onclick="navigateTo('logo-usage')" style="--chapter-color: var(--ch3-logo); --chapter-color-dim: var(--ch3-dim);">
-          <span class="nav-dot"></span>
-          3. Логотип & Logobook
-        </a>
-        <div class="submenu" id="logobookSubmenu" style="display: none; padding-left: 20px; margin-top: 4px; border-left: 1px solid var(--color-border); margin-left: 10px;">
-          <a class="nav-item submenu-item" onclick="navigateIframe('logo-usage', '#section-intro')" style="font-size: 13px; padding: 4px 8px; min-height: 28px;">01. Вводная часть</a>
-          <a class="nav-item submenu-item" onclick="navigateIframe('logo-usage', '#section-constants')" style="font-size: 13px; padding: 4px 8px; min-height: 28px;">02. Константы</a>
-          <a class="nav-item submenu-item" onclick="navigateIframe('logo-usage', '#section-docs')" style="font-size: 13px; padding: 4px 8px; min-height: 28px;">03. Документация</a>
-          <a class="nav-item submenu-item" onclick="navigateIframe('logo-usage', '#section-stickers')" style="font-size: 13px; padding: 4px 8px; min-height: 28px;">04. Наклейки</a>
-          <a class="nav-item submenu-item" onclick="navigateIframe('logo-usage', '#section-cars')" style="font-size: 13px; padding: 4px 8px; min-height: 28px;">05. Автомобили</a>
-          <a class="nav-item submenu-item" onclick="navigateIframe('logo-usage', '#section-uniform')" style="font-size: 13px; padding: 4px 8px; min-height: 28px;">06. Форма</a>
-          <a class="nav-item submenu-item" onclick="navigateIframe('logo-usage', '#section-merch')" style="font-size: 13px; padding: 4px 8px; min-height: 28px;">07. Сувениры</a>
-          <a class="nav-item submenu-item" onclick="navigateIframe('logo-usage', '#section-ads')" style="font-size: 13px; padding: 4px 8px; min-height: 28px;">08. Реклама / фасад</a>
-        </div>
-      </div>
-
-      <!-- Ch.4 Marketing -->
-      <div class="nav-section">
-        <span class="nav-section-title">Коммуникации</span>
-        <a class="nav-item" data-page="marketing" onclick="navigateTo('marketing')" style="--chapter-color: var(--ch4-marketing); --chapter-color-dim: var(--ch4-dim);">
-          <span class="nav-dot"></span>
-          4. Marketing Assets
-        </a>
-      </div>
-
-      <!-- Ch.5 Corporate Docs -->
-      <div class="nav-section">
-        <a class="nav-item" data-page="corporate" onclick="navigateTo('corporate')" style="--chapter-color: var(--ch5-corporate); --chapter-color-dim: var(--ch5-dim);">
-          <span class="nav-dot"></span>
-          5. Деловая документация
-        </a>
-      </div>
-
-      <!-- Ch.6 Digital -->
-      <div class="nav-section">
-        <span class="nav-section-title">Каналы</span>
-        <a class="nav-item" data-page="digital" onclick="navigateTo('digital')" style="--chapter-color: var(--ch6-digital); --chapter-color-dim: var(--ch6-dim);">
-          <span class="nav-dot"></span>
-          6. Digital Presence
-        </a>
-      </div>
-
-      <!-- Ch.7 Physical -->
-      <div class="nav-section">
-        <a class="nav-item" data-page="physical" onclick="navigateTo('physical')" style="--chapter-color: var(--ch7-physical); --chapter-color-dim: var(--ch7-dim);">
-          <span class="nav-dot"></span>
-          7. Физические носители
-        </a>
-      </div>
-
-      <!-- Ch.8 Resources -->
-      <div class="nav-section">
-        <a class="nav-item" data-page="resources" onclick="navigateTo('resources')" style="--chapter-color: var(--ch8-resources); --chapter-color-dim: var(--ch8-dim);">
-          <span class="nav-dot"></span>
-          8. Ресурсы & Загрузки
-        </a>
-      </div>
-
-    </nav>
-    <div style="padding: var(--space-4) var(--space-5); border-top: 1px solid var(--color-border); font-size: var(--text-xs); color: var(--color-text-muted);">
-      v1.0 · Июнь 2026
-    </div>
-  </aside>
-
-  <!-- ════════════════ HEADER ════════════════ -->
-  <style>
-    body.particles-hidden iframe[src*="background particles"] {
-      opacity: 0 !important;
-    }
-    iframe[src*="background particles"] {
-      transition: opacity 0.4s ease !important;
-    }
-
-    .particle-toggle-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .particle-toggle-label {
-      font-size: var(--text-xs);
-      color: var(--color-text-tertiary);
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-caps);
-    }
-    .toggle-switch {
-      position: relative;
-      display: inline-block;
-      width: 36px;
-      height: 20px;
-    }
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    .toggle-slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: var(--color-border);
-      transition: .4s;
-      border-radius: 20px;
-    }
-    .toggle-slider:before {
-      position: absolute;
-      content: "";
-      height: 14px;
-      width: 14px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .toggle-switch input:checked + .toggle-slider {
-      background-color: #1B2B5A;
-    }
-    .toggle-switch input:checked + .toggle-slider:before {
-      transform: translateX(16px);
-    }
-  </style>
-  <header class="app-header">
-    <div class="header-logo">
-      <button id="menuToggle" onclick="toggleSidebar()" style="background:none;border:none;color:var(--color-text-tertiary);font-size:18px;cursor:pointer;display:none;">☰</button>
-      <nav class="breadcrumbs" id="breadcrumbs">
-        <a href="#" onclick="navigateTo('dashboard')">Brandbook</a>
-        <span class="sep">›</span>
-        <span class="current" id="breadcrumbCurrent">Главная</span>
-      </nav>
-    </div>
-    <div style="display: flex; align-items: center; gap: 24px;">
-      <div class="particle-toggle-wrapper">
-        <span class="particle-toggle-label">Частицы</span>
-        <label class="toggle-switch">
-          <input type="checkbox" id="particlesToggle" onchange="toggleParticles(this.checked)">
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-      <div class="header-search">
-        <span class="search-icon">⌕</span>
-        <input type="text" placeholder="Поиск по разделам..." id="searchInput" onkeyup="handleSearch(this.value)">
-      </div>
-    </div>
-  </header>
-
-  <!-- ════════════════ MAIN ════════════════ -->
-  <main class="app-main" id="appMain">
-
-    <!-- ═══════ PAGE: DASHBOARD ═══════ -->
-    <div class="page-section active" id="page-dashboard" style="position: relative; min-height: 100vh; background: #f0f2f5; --color-text-primary: #1B2B5A; --color-text-secondary: #444; --bg-surface: rgba(255,255,255,0.85); --line: rgba(0,0,0,0.08); overflow: hidden;">
-      <!-- Общий фон с частицами -->
-      <iframe src="background particles/logo_txt_rott_01_white.html" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: none; pointer-events: none; z-index: 0;"></iframe>
-      <iframe src="background particles/logo_znak_rott_01_white.html" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: none; pointer-events: none; z-index: 0;"></iframe>
-
-      <div class="content-wrapper" style="position: relative; z-index: 1;">
-        <div class="hero" style="position: relative; background: transparent;">
-          <div class="hero-content" style="position: relative; z-index: 2;">
-            <div class="hero-badge" style="background: rgba(0,0,0,0.05); color: #1B2B5A;">⬡ Corporate Brandbook</div>
-            <div style="display: flex; justify-content: center; margin-bottom: var(--space-4);">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 784 141.5" style="width: 400px; height: 70px;">
-                <defs>
-                  <linearGradient id="grad-txt" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#1B2B5A" />
-                    <stop offset="100%" stop-color="#4facfe" />
-                  </linearGradient>
-                </defs>
-                <g fill="url(#grad-txt)">
-                  <path d="M0,.65C12.47,1.11,25.12.04,37.58.65c1.02.05,3.71-.17,4.11.84l54.87,94.98,14.29-25.67L71.69.65h42.78l54.93,97L212.75,3.3c1.8-3.3,4.91-3.75,8.17-2.98l1.71.54-65.53,139.33-3.29-.4c-16.29-16.77-23.96-40.52-37.59-59.44l-32.36,61.13c-3.18.44-16.55-22.35-18.87-26.16C42.16,77.88,22.54,38.28,0,.65"/>
-                  <path d="M784,.65v137.42h-26.02l-4.61-6.9c-45.76,31.19-82.23-21.76-64.52-65.61,9.81-24.29,43.95-38.28,67.4-25.65V.72c.9-.25,1.4-.07,1.73-.07h26.02ZM737.45,42.51c-31.76,4.94-31.77,87.81,3.21,86.4,4.66-.19,14.48-3.47,15.56-8.77-1.36-20.45,1.93-43.38.07-63.52-.36-3.88-.75-8.42-4.05-10.97-4.48-3.18-9.4-3.99-14.79-3.15Z"/>
-                  <path d="M400.09,138.07L401.89.37l24.8.29v91.22c2.33.42,3.25-1.55,4.58-2.92,8.5-8.72,43.07-55.51,43.07-55.51,0,0,3.2-.04,4.8.09l-29.13,42.59,47.21,61.37-27.72,1.12-33.03-43.28c-15.45,6.25-9.78,29.27-9.78,42.73h-26.6Z"/>
-                  <path d="M614.02,35.3v10.4c13.8-4.84,21.85-11.16,37.58-9.24,12.06,1.47,22.55,12.53,22.55,24.83v76.79h-26.6c.82-21.91,2.76-46.88,1.21-68.77-.39-5.44-1.14-14.04-5.24-17.86-9.53-7.73-19.48-.83-29.51,1.18v85.45h-26.6V35.3h26.6Z"/>
-                  <path d="M578.17,80.33h-62.44c-5.09,27.98,10.73,61.55,43.15,42.52,6.76-3.97,10.79-11.6,18.13-13.64.37,14.66-22.29,27.28-35.39,28.74-35.29,3.93-58.18-20.04-55.93-54.7,3.92-60.35,90.44-66.96,92.48-2.92ZM515.72,73.41l33.57-.55c5.75-42.87-36.34-40.54-33.57.55Z"/>
-                  <path d="M228.96,99.39c2.62,24.28,19.99,36.66,42.43,23.89,5.07-2.89,13.41-12.86,16.15-13.9.77-.29,2.63-.71,2.71.4-1.41,15.79-22.11,26.95-36.46,28.26-77.12,7.04-69.63-109.97,1.17-102.74,21.78,2.23,37.41,22.44,34.78,43.94l-60.78,1.66c.46,5.95-.63,12.65,0,18.48ZM230.69,74.56h27.75c9.06,0,3.89-18.45,1.79-23.72-2.26-5.66-5.78-9.61-12.19-9.86-16.02-.63-18.91,19.64-18.9,31.67l1.55,1.92Z"/>
-                  <path d="M390.8,79.1s-8.5.07-13.19.02c-13.09-.13-31.35-.48-44.05,1.16-7.28.94-5.73,11.93-5.14,17.94,2.51,25.5,22,38.76,45,24.19,1.82-1.15,15.31-14.33,16.26-13.19,1.08,12.19-16.39,24.03-26.79,26.93-34.18,9.52-65.08-12.38-64.63-48.3.76-61.97,89.19-75.21,92.54-8.74ZM340.79,42.48c-8.65,1.98-12.88,23.32-10.73,31l31.95-.57c2.8-16.21-.19-35.24-21.21-30.42Z"/>
-                </g>
-              </svg>
+        <div class="stat-widget">
+          <div class="stat-widget-header">По разделам</div>
+          <div class="bar-chart">
+            <div class="bar">
+              <div class="bar-fill" style="height: 100%; background: var(--ch1-brand-identity);"></div>
+              <div class="bar-label">01</div>
             </div>
-            <p class="hero-subtitle" style="color: #333; font-weight: 500;">Полное руководство по визуальной идентичности, стандартам коммуникации и применению бренда на всех носителях</p>
-            <div class="hero-meta">
-              <div class="hero-stat">
-                <div class="hero-stat-value">2026</div>
-                <div class="hero-stat-label">Версия</div>
+            <div class="bar">
+              <div class="bar-fill" style="height: 80%; background: var(--ch2-visual-system);"></div>
+              <div class="bar-label">02</div>
+            </div>
+            <div class="bar">
+              <div class="bar-fill" style="height: 60%; background: var(--ch3-logo);"></div>
+              <div class="bar-label">03</div>
+            </div>
+            <div class="bar">
+              <div class="bar-fill" style="height: 30%; background: var(--ch4-marketing);"></div>
+              <div class="bar-label">04</div>
+            </div>
+            <div class="bar">
+              <div class="bar-fill" style="height: 90%; background: var(--ch5-corporate);"></div>
+              <div class="bar-label">05</div>
+            </div>
+            <div class="bar">
+              <div class="bar-fill" style="height: 10%; background: var(--ch6-digital);"></div>
+              <div class="bar-label">06</div>
+            </div>
+            <div class="bar">
+              <div class="bar-fill" style="height: 40%; background: var(--ch7-physical);"></div>
+              <div class="bar-label">07</div>
+            </div>
+            <div class="bar">
+              <div class="bar-fill" style="height: 100%; background: var(--ch8-resources);"></div>
+              <div class="bar-label">08</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" id="sidebarNav">
+
+        <div class="nav-section">
+          <a class="nav-item active" data-page="dashboard" onclick="navigateTo('dashboard')">
+            <span class="nav-dot" style="background: var(--color-accent-gold);"></span>
+            Главная
+          </a>
+        </div>
+
+        <!-- Ch.1 Brand Identity -->
+        <div class="nav-section">
+          <span class="nav-section-title">Основа</span>
+          <a class="nav-item" data-page="brand-identity" onclick="navigateTo('brand-identity')"
+            style="--chapter-color: var(--ch1-brand-identity); --chapter-color-dim: var(--ch1-dim);">
+            <span class="nav-dot"></span>
+            1. Brand Identity
+          </a>
+        </div>
+
+        <!-- Ch.2 Visual System -->
+        <div class="nav-section">
+          <span class="nav-section-title">Дизайн-система</span>
+          <a class="nav-item" data-page="visual-system" onclick="navigateTo('visual-system')"
+            style="--chapter-color: var(--ch2-visual-system); --chapter-color-dim: var(--ch2-dim);">
+            <span class="nav-dot"></span>
+            2. Visual System
+          </a>
+        </div>
+
+        <!-- Ch.3 Logo & Usage -->
+        <div class="nav-section has-submenu">
+          <a class="nav-item" data-page="logo-usage" onclick="navigateTo('logo-usage')"
+            style="--chapter-color: var(--ch3-logo); --chapter-color-dim: var(--ch3-dim);">
+            <span class="nav-dot"></span>
+            3. Логотип & Logobook
+          </a>
+          <div class="submenu" id="logobookSubmenu"
+            style="display: none; padding-left: 20px; margin-top: 4px; border-left: 1px solid var(--color-border); margin-left: 10px;">
+            <a class="nav-item submenu-item" onclick="navigateIframe('logo-usage', '#section-intro')"
+              style="font-size: 13px; padding: 4px 8px; min-height: 28px;">01. Вводная часть</a>
+            <a class="nav-item submenu-item" onclick="navigateIframe('logo-usage', '#section-constants')"
+              style="font-size: 13px; padding: 4px 8px; min-height: 28px;">02. Константы</a>
+            <a class="nav-item submenu-item" onclick="navigateIframe('logo-usage', '#section-docs')"
+              style="font-size: 13px; padding: 4px 8px; min-height: 28px;">03. Документация</a>
+            <a class="nav-item submenu-item" onclick="navigateIframe('logo-usage', '#section-stickers')"
+              style="font-size: 13px; padding: 4px 8px; min-height: 28px;">04. Наклейки</a>
+            <a class="nav-item submenu-item" onclick="navigateIframe('logo-usage', '#section-cars')"
+              style="font-size: 13px; padding: 4px 8px; min-height: 28px;">05. Автомобили</a>
+            <a class="nav-item submenu-item" onclick="navigateIframe('logo-usage', '#section-uniform')"
+              style="font-size: 13px; padding: 4px 8px; min-height: 28px;">06. Форма</a>
+            <a class="nav-item submenu-item" onclick="navigateIframe('logo-usage', '#section-merch')"
+              style="font-size: 13px; padding: 4px 8px; min-height: 28px;">07. Сувениры</a>
+            <a class="nav-item submenu-item" onclick="navigateIframe('logo-usage', '#section-ads')"
+              style="font-size: 13px; padding: 4px 8px; min-height: 28px;">08. Реклама / фасад</a>
+          </div>
+        </div>
+
+        <!-- Ch.4 Marketing -->
+        <div class="nav-section">
+          <span class="nav-section-title">Коммуникации</span>
+          <a class="nav-item" data-page="marketing" onclick="navigateTo('marketing')"
+            style="--chapter-color: var(--ch4-marketing); --chapter-color-dim: var(--ch4-dim);">
+            <span class="nav-dot"></span>
+            4. Marketing Assets
+          </a>
+        </div>
+
+        <!-- Ch.5 Corporate Docs -->
+        <div class="nav-section">
+          <a class="nav-item" data-page="corporate" onclick="navigateTo('corporate')"
+            style="--chapter-color: var(--ch5-corporate); --chapter-color-dim: var(--ch5-dim);">
+            <span class="nav-dot"></span>
+            5. Деловая документация
+          </a>
+        </div>
+
+        <!-- Ch.6 Digital -->
+        <div class="nav-section">
+          <span class="nav-section-title">Каналы</span>
+          <a class="nav-item" data-page="digital" onclick="navigateTo('digital')"
+            style="--chapter-color: var(--ch6-digital); --chapter-color-dim: var(--ch6-dim);">
+            <span class="nav-dot"></span>
+            6. Digital Presence
+          </a>
+        </div>
+
+        <!-- Ch.7 Physical -->
+        <div class="nav-section">
+          <a class="nav-item" data-page="physical" onclick="navigateTo('physical')"
+            style="--chapter-color: var(--ch7-physical); --chapter-color-dim: var(--ch7-dim);">
+            <span class="nav-dot"></span>
+            7. Физические носители
+          </a>
+        </div>
+
+        <!-- Ch.8 Resources -->
+        <div class="nav-section">
+          <a class="nav-item" data-page="resources" onclick="navigateTo('resources')"
+            style="--chapter-color: var(--ch8-resources); --chapter-color-dim: var(--ch8-dim);">
+            <span class="nav-dot"></span>
+            8. Ресурсы & Загрузки
+          </a>
+        </div>
+
+      </nav>
+      <div
+        style="padding: var(--space-4) var(--space-5); border-top: 1px solid var(--color-border); font-size: var(--text-xs); color: var(--color-text-muted);">
+        v1.0 · Июнь 2026
+      </div>
+    </aside>
+
+    <!-- ════════════════ HEADER ════════════════ -->
+    <style>
+      body.particles-hidden iframe[src*="background particles"] {
+        opacity: 0 !important;
+      }
+
+      iframe[src*="background particles"] {
+        transition: opacity 0.4s ease !important;
+      }
+
+      .particle-toggle-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .particle-toggle-label {
+        font-size: var(--text-xs);
+        color: var(--color-text-tertiary);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: var(--tracking-caps);
+      }
+
+      .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 36px;
+        height: 20px;
+      }
+
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--color-border);
+        transition: .4s;
+        border-radius: 20px;
+      }
+
+      .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 14px;
+        width: 14px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .toggle-switch input:checked+.toggle-slider {
+        background-color: #1B2B5A;
+      }
+
+      .toggle-switch input:checked+.toggle-slider:before {
+        transform: translateX(16px);
+      }
+    </style>
+    <header class="app-header">
+      <div class="header-logo">
+        <button id="menuToggle" onclick="toggleSidebar()"
+          style="background:none;border:none;color:var(--color-text-tertiary);font-size:18px;cursor:pointer;display:none;">☰</button>
+        <nav class="breadcrumbs" id="breadcrumbs">
+          <a href="#" onclick="navigateTo('dashboard')">Brandbook</a>
+          <span class="sep">›</span>
+          <span class="current" id="breadcrumbCurrent">Главная</span>
+        </nav>
+      </div>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Переключить тему">
+          <span class="theme-toggle-icon" id="themeIcon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          </span>
+        </button>
+        <div class="particle-toggle-wrapper">
+          <span class="particle-toggle-label">Частицы</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="particlesToggle" onchange="toggleParticles(this.checked)">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="header-search">
+          <span class="search-icon">⌕</span>
+          <input type="text" placeholder="Поиск по разделам..." id="searchInput" onkeyup="handleSearch(this.value)">
+        </div>
+      </div>
+    </header>
+
+    <!-- ════════════════ MAIN ════════════════ -->
+    <main class="app-main" id="appMain">
+
+      <!-- ═══════ PAGE: DASHBOARD ═══════ -->
+      <div class="page-section active" id="page-dashboard"
+        style="position: relative; min-height: 100vh; background: #f0f2f5; --color-text-primary: #1B2B5A; --color-text-secondary: #444; --bg-surface: rgba(255,255,255,0.85); --line: rgba(0,0,0,0.08); overflow: hidden;">
+        <!-- Общий фон с частицами -->
+        <iframe src="background particles/logo_txt_rott_01_white.html"
+          style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: none; pointer-events: none; z-index: 0;"></iframe>
+        <iframe src="background particles/logo_znak_rott_01_white.html"
+          style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: none; pointer-events: none; z-index: 0;"></iframe>
+
+        <div class="content-wrapper" style="position: relative; z-index: 1;">
+          <div class="hero" style="position: relative; background: transparent;">
+            <div class="hero-content" style="position: relative; z-index: 2;">
+              <div class="hero-badge" style="background: rgba(0,0,0,0.05); color: #1B2B5A;">⬡ Corporate Brandbook</div>
+              <div style="display: flex; justify-content: center; margin-bottom: var(--space-4);">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 784 141.5" style="width: 400px; height: 70px;">
+                  <defs>
+                    <linearGradient id="grad-txt" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#1B2B5A" />
+                      <stop offset="100%" stop-color="#4facfe" />
+                    </linearGradient>
+                  </defs>
+                  <g fill="url(#grad-txt)">
+                    <path
+                      d="M0,.65C12.47,1.11,25.12.04,37.58.65c1.02.05,3.71-.17,4.11.84l54.87,94.98,14.29-25.67L71.69.65h42.78l54.93,97L212.75,3.3c1.8-3.3,4.91-3.75,8.17-2.98l1.71.54-65.53,139.33-3.29-.4c-16.29-16.77-23.96-40.52-37.59-59.44l-32.36,61.13c-3.18.44-16.55-22.35-18.87-26.16C42.16,77.88,22.54,38.28,0,.65" />
+                    <path
+                      d="M784,.65v137.42h-26.02l-4.61-6.9c-45.76,31.19-82.23-21.76-64.52-65.61,9.81-24.29,43.95-38.28,67.4-25.65V.72c.9-.25,1.4-.07,1.73-.07h26.02ZM737.45,42.51c-31.76,4.94-31.77,87.81,3.21,86.4,4.66-.19,14.48-3.47,15.56-8.77-1.36-20.45,1.93-43.38.07-63.52-.36-3.88-.75-8.42-4.05-10.97-4.48-3.18-9.4-3.99-14.79-3.15Z" />
+                    <path
+                      d="M400.09,138.07L401.89.37l24.8.29v91.22c2.33.42,3.25-1.55,4.58-2.92,8.5-8.72,43.07-55.51,43.07-55.51,0,0,3.2-.04,4.8.09l-29.13,42.59,47.21,61.37-27.72,1.12-33.03-43.28c-15.45,6.25-9.78,29.27-9.78,42.73h-26.6Z" />
+                    <path
+                      d="M614.02,35.3v10.4c13.8-4.84,21.85-11.16,37.58-9.24,12.06,1.47,22.55,12.53,22.55,24.83v76.79h-26.6c.82-21.91,2.76-46.88,1.21-68.77-.39-5.44-1.14-14.04-5.24-17.86-9.53-7.73-19.48-.83-29.51,1.18v85.45h-26.6V35.3h26.6Z" />
+                    <path
+                      d="M578.17,80.33h-62.44c-5.09,27.98,10.73,61.55,43.15,42.52,6.76-3.97,10.79-11.6,18.13-13.64.37,14.66-22.29,27.28-35.39,28.74-35.29,3.93-58.18-20.04-55.93-54.7,3.92-60.35,90.44-66.96,92.48-2.92ZM515.72,73.41l33.57-.55c5.75-42.87-36.34-40.54-33.57.55Z" />
+                    <path
+                      d="M228.96,99.39c2.62,24.28,19.99,36.66,42.43,23.89,5.07-2.89,13.41-12.86,16.15-13.9.77-.29,2.63-.71,2.71.4-1.41,15.79-22.11,26.95-36.46,28.26-77.12,7.04-69.63-109.97,1.17-102.74,21.78,2.23,37.41,22.44,34.78,43.94l-60.78,1.66c.46,5.95-.63,12.65,0,18.48ZM230.69,74.56h27.75c9.06,0,3.89-18.45,1.79-23.72-2.26-5.66-5.78-9.61-12.19-9.86-16.02-.63-18.91,19.64-18.9,31.67l1.55,1.92Z" />
+                    <path
+                      d="M390.8,79.1s-8.5.07-13.19.02c-13.09-.13-31.35-.48-44.05,1.16-7.28.94-5.73,11.93-5.14,17.94,2.51,25.5,22,38.76,45,24.19,1.82-1.15,15.31-14.33,16.26-13.19,1.08,12.19-16.39,24.03-26.79,26.93-34.18,9.52-65.08-12.38-64.63-48.3.76-61.97,89.19-75.21,92.54-8.74ZM340.79,42.48c-8.65,1.98-12.88,23.32-10.73,31l31.95-.57c2.8-16.21-.19-35.24-21.21-30.42Z" />
+                  </g>
+                </svg>
+              </div>
+              <p class="hero-subtitle" style="color: #333; font-weight: 500;">Полное руководство по визуальной
+                идентичности, стандартам коммуникации и применению бренда на всех носителях</p>
+              <div class="hero-meta">
+                <div class="hero-stat">
+                  <div class="hero-stat-value">2026</div>
+                  <div class="hero-stat-label">Версия</div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <h2 style="font-size: var(--text-xl); margin-bottom: var(--space-6); font-weight: 700;">Разделы брендбука</h2>
-        <div class="card-grid" id="chapterGrid">
+          <h2 style="font-size: var(--text-xl); margin-bottom: var(--space-6); font-weight: 700;">Разделы брендбука</h2>
+          <div class="card-grid" id="chapterGrid">
 
-          <div class="card chapter-card" onclick="navigateTo('brand-identity')" style="--chapter-color: var(--ch1-brand-identity); --chapter-color-dim: var(--ch1-dim);">
-            <div class="chapter-number">РАЗДЕЛ 01</div>
-            <div class="chapter-icon">◆</div>
-            <div class="chapter-title">Brand Identity</div>
-            <div class="chapter-desc">Миссия, ценности, позиционирование, tone of voice, архетип бренда</div>
-            <div class="chapter-count">6 подразделов</div>
-          </div>
-
-          <div class="card chapter-card" onclick="navigateTo('visual-system')" style="--chapter-color: var(--ch2-visual-system); --chapter-color-dim: var(--ch2-dim);">
-            <div class="chapter-number">РАЗДЕЛ 02</div>
-            <div class="chapter-icon">◐</div>
-            <div class="chapter-title">Visual System</div>
-            <div class="chapter-desc">Цвета, типографика, иконография, фотостиль, паттерны, сетка</div>
-            <div class="chapter-count">6 подразделов</div>
-          </div>
-
-          <div class="card chapter-card" onclick="navigateTo('logo-usage')" style="--chapter-color: var(--ch3-logo); --chapter-color-dim: var(--ch3-dim);">
-            <div class="chapter-number">РАЗДЕЛ 03</div>
-            <div class="chapter-icon">⬡</div>
-            <div class="chapter-title">Логотип & Logobook</div>
-            <div class="chapter-desc">Разработка логотипа, вариации, правила использования, паттерны, фирменный блок</div>
-            <div class="chapter-count">24 страницы</div>
-          </div>
-
-          <div class="card chapter-card" onclick="navigateTo('marketing')" style="--chapter-color: var(--ch4-marketing); --chapter-color-dim: var(--ch4-dim);">
-            <div class="chapter-number">РАЗДЕЛ 04</div>
-            <div class="chapter-icon">◈</div>
-            <div class="chapter-title">Marketing Assets</div>
-            <div class="chapter-desc">Соцсети, баннеры, POS-материалы, мерч, фотоархив</div>
-            <div class="chapter-count">5 подразделов</div>
-          </div>
-
-          <div class="card chapter-card" onclick="navigateTo('corporate')" style="--chapter-color: var(--ch5-corporate); --chapter-color-dim: var(--ch5-dim);">
-            <div class="chapter-number">РАЗДЕЛ 05</div>
-            <div class="chapter-icon">▣</div>
-            <div class="chapter-title">Деловая документация</div>
-            <div class="chapter-desc">Визитки, бланки, конверты, коммерческие предложения, презентации</div>
-            <div class="chapter-count">18 страниц</div>
-          </div>
-
-          <div class="card chapter-card" onclick="navigateTo('digital')" style="--chapter-color: var(--ch6-digital); --chapter-color-dim: var(--ch6-dim);">
-            <div class="chapter-number">РАЗДЕЛ 06</div>
-            <div class="chapter-icon">◎</div>
-            <div class="chapter-title">Digital Presence</div>
-            <div class="chapter-desc">Веб-сайт, email-шаблоны, социальные медиа, онлайн-магазин</div>
-            <div class="chapter-count">3 подраздела</div>
-          </div>
-
-          <div class="card chapter-card" onclick="navigateTo('physical')" style="--chapter-color: var(--ch7-physical); --chapter-color-dim: var(--ch7-dim);">
-            <div class="chapter-number">РАЗДЕЛ 07</div>
-            <div class="chapter-icon">⬢</div>
-            <div class="chapter-title">Физические носители</div>
-            <div class="chapter-desc">Транспорт, форма сотрудников, вывески, сувенирная продукция</div>
-            <div class="chapter-count">20 страниц</div>
-          </div>
-
-          <div class="card chapter-card" onclick="navigateTo('resources')" style="--chapter-color: var(--ch8-resources); --chapter-color-dim: var(--ch8-dim);">
-            <div class="chapter-number">РАЗДЕЛ 08</div>
-            <div class="chapter-icon">⤓</div>
-            <div class="chapter-title">Ресурсы & Загрузки</div>
-            <div class="chapter-desc">Шаблоны, гайды для подрядчиков, FAQ, файлы логотипов</div>
-            <div class="chapter-count">3 подраздела</div>
-          </div>
-
-        </div>
-
-        <div class="divider" style="margin-top: var(--space-16);"></div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-6); margin-top: var(--space-8);">
-          <div class="card" style="text-align:center;">
-            <div style="font-size: var(--text-xs); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: var(--tracking-caps); margin-bottom: var(--space-2);">Основано</div>
-            <div style="font-size: var(--text-2xl); font-weight: 800; color: var(--color-accent-gold);">Weekend</div>
-            <div style="font-size: var(--text-sm); color: var(--color-text-tertiary);">Billiard Company</div>
-          </div>
-          <div class="card" style="text-align:center;">
-            <div style="font-size: var(--text-xs); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: var(--tracking-caps); margin-bottom: var(--space-2);">Сфера</div>
-            <div style="font-size: var(--text-lg); font-weight: 700;">Бильярдное оборудование</div>
-            <div style="font-size: var(--text-sm); color: var(--color-text-tertiary);">Продажа и доставка по РФ</div>
-          </div>
-          <div class="card" style="text-align:center;">
-            <div style="font-size: var(--text-xs); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: var(--tracking-caps); margin-bottom: var(--space-2);">Контакты</div>
-            <div style="font-size: var(--text-md); font-weight: 600;">weekend-billiard.ru</div>
-            <div style="font-size: var(--text-sm); color: var(--color-text-tertiary);">Москва · Санкт-Петербург</div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ═══════ PAGE: BRAND IDENTITY ═══════ -->
-    <div class="page-section" id="page-brand-identity" style="--chapter-color: var(--ch1-brand-identity); --chapter-color-dim: var(--ch1-dim);">
-      <iframe src="background particles/r01.html" class="section-particles-iframe"></iframe>
-      <div class="content-wrapper">
-        <div class="section-header">
-          <div class="section-eyebrow"><span>◆</span> Раздел 01</div>
-          <h1 class="section-title">Brand Identity</h1>
-          <p class="section-desc">Фундамент бренда — миссия, ценности, позиционирование, голос и характер Weekend Billiard</p>
-        </div>
-
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">1.1 Миссия & Визия</h3>
-          <p class="subsection-desc">Формулировка ключевой идеи бренда и видение развития на 3-5 лет</p>
-          <div class="placeholder-block">
-            <div class="placeholder-icon">◇</div>
-            <div class="placeholder-label">Миссия компании</div>
-            <div class="placeholder-hint">Ожидает утверждения руководством. Формулировка ключевой идеи бренда Weekend Billiard.</div>
-            <span class="badge badge-pending">Ожидает заполнения</span>
-          </div>
-        </div>
-
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">1.2 Ценности бренда</h3>
-          <p class="subsection-desc">Атрибуты и смысловые характеристики, определяющие бренд</p>
-          <div class="placeholder-block">
-            <div class="placeholder-icon">◈</div>
-            <div class="placeholder-label">Ценности и атрибуты</div>
-            <div class="placeholder-hint">Набор ценностей: качество, надёжность, стиль, современность, партнёрство, инновационность. Визуальная система должна уверенно противопоставить себя стереотипу устаревшего рынка.</div>
-            <span class="badge badge-pending">Ожидает заполнения</span>
-          </div>
-        </div>
-
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">1.3 Brand Story</h3>
-          <p class="subsection-desc">История бренда Weekend Billiard — от основания до наших дней</p>
-          <div class="placeholder-block">
-            <div class="placeholder-icon">◆</div>
-            <div class="placeholder-label">История компании</div>
-            <div class="placeholder-hint">Хронология развития, ключевые вехи, расширение географии. Предоставляется руководством.</div>
-            <span class="badge badge-pending">Ожидает заполнения</span>
-          </div>
-        </div>
-
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">1.4 Позиционирование</h3>
-          <p class="subsection-desc">Целевая аудитория, конкурентная карта, уникальное торговое предложение</p>
-          <div class="card-grid">
-            <div class="card">
-              <h5 style="margin-bottom: var(--space-3); color: var(--ch1-brand-identity);">Целевая аудитория</h5>
-              <p style="font-size: var(--text-sm);">Частные клиенты, HoReCa, бильярдные клубы, развлекательные центры</p>
+            <div class="card chapter-card" onclick="navigateTo('brand-identity')"
+              style="--chapter-color: var(--ch1-brand-identity); --chapter-color-dim: var(--ch1-dim);">
+              <div class="chapter-number">РАЗДЕЛ 01</div>
+              <div class="chapter-icon">◆</div>
+              <div class="chapter-title">Brand Identity</div>
+              <div class="chapter-desc">Миссия, ценности, позиционирование, tone of voice, архетип бренда</div>
+              <div class="chapter-count">6 подразделов</div>
             </div>
-            <div class="card">
-              <h5 style="margin-bottom: var(--space-3); color: var(--ch1-brand-identity);">USP</h5>
-              <p style="font-size: var(--text-sm);">Федеральный поставщик бильярдного оборудования с доставкой в 90+ городов России</p>
+
+            <div class="card chapter-card" onclick="navigateTo('visual-system')"
+              style="--chapter-color: var(--ch2-visual-system); --chapter-color-dim: var(--ch2-dim);">
+              <div class="chapter-number">РАЗДЕЛ 02</div>
+              <div class="chapter-icon">◐</div>
+              <div class="chapter-title">Visual System</div>
+              <div class="chapter-desc">Цвета, типографика, иконография, фотостиль, паттерны, сетка</div>
+              <div class="chapter-count">6 подразделов</div>
             </div>
-            <div class="card">
-              <h5 style="margin-bottom: var(--space-3); color: var(--ch1-brand-identity);">География</h5>
-              <p style="font-size: var(--text-sm);">Москва, Санкт-Петербург + пункты выдачи по всей России</p>
+
+            <div class="card chapter-card" onclick="navigateTo('logo-usage')"
+              style="--chapter-color: var(--ch3-logo); --chapter-color-dim: var(--ch3-dim);">
+              <div class="chapter-number">РАЗДЕЛ 03</div>
+              <div class="chapter-icon">⬡</div>
+              <div class="chapter-title">Логотип & Logobook</div>
+              <div class="chapter-desc">Разработка логотипа, вариации, правила использования, паттерны, фирменный блок
+              </div>
+              <div class="chapter-count">24 страницы</div>
+            </div>
+
+            <div class="card chapter-card" onclick="navigateTo('marketing')"
+              style="--chapter-color: var(--ch4-marketing); --chapter-color-dim: var(--ch4-dim);">
+              <div class="chapter-number">РАЗДЕЛ 04</div>
+              <div class="chapter-icon">◈</div>
+              <div class="chapter-title">Marketing Assets</div>
+              <div class="chapter-desc">Соцсети, баннеры, POS-материалы, мерч, фотоархив</div>
+              <div class="chapter-count">5 подразделов</div>
+            </div>
+
+            <div class="card chapter-card" onclick="navigateTo('corporate')"
+              style="--chapter-color: var(--ch5-corporate); --chapter-color-dim: var(--ch5-dim);">
+              <div class="chapter-number">РАЗДЕЛ 05</div>
+              <div class="chapter-icon">▣</div>
+              <div class="chapter-title">Деловая документация</div>
+              <div class="chapter-desc">Визитки, бланки, конверты, коммерческие предложения, презентации</div>
+              <div class="chapter-count">18 страниц</div>
+            </div>
+
+            <div class="card chapter-card" onclick="navigateTo('digital')"
+              style="--chapter-color: var(--ch6-digital); --chapter-color-dim: var(--ch6-dim);">
+              <div class="chapter-number">РАЗДЕЛ 06</div>
+              <div class="chapter-icon">◎</div>
+              <div class="chapter-title">Digital Presence</div>
+              <div class="chapter-desc">Веб-сайт, email-шаблоны, социальные медиа, онлайн-магазин</div>
+              <div class="chapter-count">3 подраздела</div>
+            </div>
+
+            <div class="card chapter-card" onclick="navigateTo('physical')"
+              style="--chapter-color: var(--ch7-physical); --chapter-color-dim: var(--ch7-dim);">
+              <div class="chapter-number">РАЗДЕЛ 07</div>
+              <div class="chapter-icon">⬢</div>
+              <div class="chapter-title">Физические носители</div>
+              <div class="chapter-desc">Транспорт, форма сотрудников, вывески, сувенирная продукция</div>
+              <div class="chapter-count">20 страниц</div>
+            </div>
+
+            <div class="card chapter-card" onclick="navigateTo('resources')"
+              style="--chapter-color: var(--ch8-resources); --chapter-color-dim: var(--ch8-dim);">
+              <div class="chapter-number">РАЗДЕЛ 08</div>
+              <div class="chapter-icon">⤓</div>
+              <div class="chapter-title">Ресурсы & Загрузки</div>
+              <div class="chapter-desc">Шаблоны, гайды для подрядчиков, FAQ, файлы логотипов</div>
+              <div class="chapter-count">3 подраздела</div>
+            </div>
+
+          </div>
+
+          <div class="divider" style="margin-top: var(--space-16);"></div>
+
+          <div
+            style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-6); margin-top: var(--space-8);">
+            <div class="card" style="text-align:center;">
+              <div
+                style="font-size: var(--text-xs); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: var(--tracking-caps); margin-bottom: var(--space-2);">
+                Основано</div>
+              <div style="font-size: var(--text-2xl); font-weight: 800; color: var(--color-accent-gold);">Weekend</div>
+              <div style="font-size: var(--text-sm); color: var(--color-text-tertiary);">Billiard Company</div>
+            </div>
+            <div class="card" style="text-align:center;">
+              <div
+                style="font-size: var(--text-xs); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: var(--tracking-caps); margin-bottom: var(--space-2);">
+                Сфера</div>
+              <div style="font-size: var(--text-lg); font-weight: 700;">Бильярдное оборудование</div>
+              <div style="font-size: var(--text-sm); color: var(--color-text-tertiary);">Продажа и доставка по РФ</div>
+            </div>
+            <div class="card" style="text-align:center;">
+              <div
+                style="font-size: var(--text-xs); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: var(--tracking-caps); margin-bottom: var(--space-2);">
+                Контакты</div>
+              <div style="font-size: var(--text-md); font-weight: 600;">weekend-billiard.ru</div>
+              <div style="font-size: var(--text-sm); color: var(--color-text-tertiary);">Москва · Санкт-Петербург</div>
             </div>
           </div>
-        </div>
 
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">1.5 Tone of Voice</h3>
-          <p class="subsection-desc">Голос бренда: как Weekend Billiard общается с аудиторией</p>
-          <div class="placeholder-block">
-            <div class="placeholder-icon">💬</div>
-            <div class="placeholder-label">Голос бренда</div>
-            <div class="placeholder-hint">Характеристики тона, шкала формальности, примеры «Так говорим» vs «Так НЕ говорим», адаптация для каналов</div>
-            <span class="badge badge-pending">Ожидает заполнения</span>
-          </div>
-        </div>
-
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">1.6 Архетип бренда</h3>
-          <p class="subsection-desc">Идентификация по Юнгу: основной и вторичный архетипы</p>
-          <div class="placeholder-block">
-            <div class="placeholder-icon">🏛</div>
-            <div class="placeholder-label">Архетип бренда</div>
-            <div class="placeholder-hint">Определение основного архетипа (60-70%) и вторичного (30-40%), визуальные и вербальные проявления</div>
-            <span class="badge badge-pending">Ожидает заполнения</span>
-          </div>
         </div>
       </div>
-    </div>
 
-    <!-- ═══════ PAGE: VISUAL SYSTEM ═══════ -->
-    <div class="page-section" id="page-visual-system" style="--chapter-color: var(--ch2-visual-system); --chapter-color-dim: var(--ch2-dim);">
-      <iframe src="background particles/r02.html" class="section-particles-iframe"></iframe>
-      <div class="content-wrapper">
-        <div class="section-header">
-          <div class="section-eyebrow"><span>◐</span> Раздел 02</div>
-          <h1 class="section-title">Visual System</h1>
-          <p class="section-desc">Полная дизайн-система бренда — цвета, шрифты, иконки, фотостиль, паттерны</p>
-        </div>
-
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">2.1 Цветовая палитра</h3>
-          <p class="subsection-desc">Основные, акцентные и нейтральные цвета с кодировками Pantone / RGB / CMYK / HEX</p>
-          <div class="swatch-grid">
-            <div class="swatch"><div class="swatch-color" style="background: #1B2B5A;"></div><div class="swatch-info"><div class="swatch-name">Navy Deep</div><div class="swatch-hex">#1B2B5A</div></div></div>
-            <div class="swatch"><div class="swatch-color" style="background: #D4AF37;"></div><div class="swatch-info"><div class="swatch-name">Gold</div><div class="swatch-hex">#D4AF37</div></div></div>
-            <div class="swatch"><div class="swatch-color" style="background: #0C5A30;"></div><div class="swatch-info"><div class="swatch-name">Billiard Green</div><div class="swatch-hex">#0C5A30</div></div></div>
-            <div class="swatch"><div class="swatch-color" style="background: #F1F5F9;"></div><div class="swatch-info"><div class="swatch-name">Slate Light</div><div class="swatch-hex">#F1F5F9</div></div></div>
-            <div class="swatch"><div class="swatch-color" style="background: #111827;"></div><div class="swatch-info"><div class="swatch-name">Carbon</div><div class="swatch-hex">#111827</div></div></div>
+      <!-- ═══════ PAGE: BRAND IDENTITY ═══════ -->
+      <div class="page-section" id="page-brand-identity"
+        style="--chapter-color: var(--ch1-brand-identity); --chapter-color-dim: var(--ch1-dim);">
+        <iframe src="background particles/r01.html" class="section-particles-iframe"></iframe>
+        <div class="content-wrapper">
+          <div class="section-header">
+            <div class="section-eyebrow"><span>◆</span> Раздел 01</div>
+            <h1 class="section-title">Brand Identity</h1>
+            <p class="section-desc">Фундамент бренда — миссия, ценности, позиционирование, голос и характер Weekend
+              Billiard</p>
           </div>
-          <div class="placeholder-block" style="margin-top: var(--space-6);">
-            <div class="placeholder-label">Полная палитра с Pantone/CMYK</div>
-            <div class="placeholder-hint">Требуется утверждение финальной палитры руководством. Dark mode варианты включены.</div>
-            <span class="badge badge-pending">Ожидает финализации</span>
-          </div>
-        </div>
 
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">2.2 Типографика</h3>
-          <p class="subsection-desc">Шрифтовые пары, масштабная шкала, правила использования</p>
-          <div class="card-grid">
-            <div class="card">
-              <div style="font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--ch2-visual-system); margin-bottom: var(--space-3);">Шрифт 1 — Заголовки</div>
-              <div class="placeholder-block" style="min-height:100px;padding:var(--space-6);"><span class="badge badge-pending">Ожидает выбора</span></div>
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">1.1 Миссия & Визия</h3>
+            <p class="subsection-desc">Формулировка ключевой идеи бренда и видение развития на 3-5 лет</p>
+            <div class="placeholder-block">
+              <div class="placeholder-icon">◇</div>
+              <div class="placeholder-label">Миссия компании</div>
+              <div class="placeholder-hint">Ожидает утверждения руководством. Формулировка ключевой идеи бренда Weekend
+                Billiard.</div>
+              <span class="badge badge-pending">Ожидает заполнения</span>
             </div>
-            <div class="card">
-              <div style="font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--ch2-visual-system); margin-bottom: var(--space-3);">Шрифт 2 — Основной текст</div>
-              <div class="placeholder-block" style="min-height:100px;padding:var(--space-6);"><span class="badge badge-pending">Ожидает выбора</span></div>
+          </div>
+
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">1.2 Ценности бренда</h3>
+            <p class="subsection-desc">Атрибуты и смысловые характеристики, определяющие бренд</p>
+            <div class="placeholder-block">
+              <div class="placeholder-icon">◈</div>
+              <div class="placeholder-label">Ценности и атрибуты</div>
+              <div class="placeholder-hint">Набор ценностей: качество, надёжность, стиль, современность, партнёрство,
+                инновационность. Визуальная система должна уверенно противопоставить себя стереотипу устаревшего рынка.
+              </div>
+              <span class="badge badge-pending">Ожидает заполнения</span>
+            </div>
+          </div>
+
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">1.3 Brand Story</h3>
+            <p class="subsection-desc">История бренда Weekend Billiard — от основания до наших дней</p>
+            <div class="placeholder-block">
+              <div class="placeholder-icon">◆</div>
+              <div class="placeholder-label">История компании</div>
+              <div class="placeholder-hint">Хронология развития, ключевые вехи, расширение географии. Предоставляется
+                руководством.</div>
+              <span class="badge badge-pending">Ожидает заполнения</span>
+            </div>
+          </div>
+
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">1.4 Позиционирование</h3>
+            <p class="subsection-desc">Целевая аудитория, конкурентная карта, уникальное торговое предложение</p>
+            <div class="card-grid">
+              <div class="card">
+                <h5 style="margin-bottom: var(--space-3); color: var(--ch1-brand-identity);">Целевая аудитория</h5>
+                <p style="font-size: var(--text-sm);">Частные клиенты, HoReCa, бильярдные клубы, развлекательные центры
+                </p>
+              </div>
+              <div class="card">
+                <h5 style="margin-bottom: var(--space-3); color: var(--ch1-brand-identity);">USP</h5>
+                <p style="font-size: var(--text-sm);">Федеральный поставщик бильярдного оборудования с доставкой в 90+
+                  городов России</p>
+              </div>
+              <div class="card">
+                <h5 style="margin-bottom: var(--space-3); color: var(--ch1-brand-identity);">География</h5>
+                <p style="font-size: var(--text-sm);">Москва, Санкт-Петербург + пункты выдачи по всей России</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">1.5 Tone of Voice</h3>
+            <p class="subsection-desc">Голос бренда: как Weekend Billiard общается с аудиторией</p>
+            <div class="placeholder-block">
+              <div class="placeholder-icon">💬</div>
+              <div class="placeholder-label">Голос бренда</div>
+              <div class="placeholder-hint">Характеристики тона, шкала формальности, примеры «Так говорим» vs «Так НЕ
+                говорим», адаптация для каналов</div>
+              <span class="badge badge-pending">Ожидает заполнения</span>
+            </div>
+          </div>
+
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">1.6 Архетип бренда</h3>
+            <p class="subsection-desc">Идентификация по Юнгу: основной и вторичный архетипы</p>
+            <div class="placeholder-block">
+              <div class="placeholder-icon">🏛</div>
+              <div class="placeholder-label">Архетип бренда</div>
+              <div class="placeholder-hint">Определение основного архетипа (60-70%) и вторичного (30-40%), визуальные и
+                вербальные проявления</div>
+              <span class="badge badge-pending">Ожидает заполнения</span>
             </div>
           </div>
         </div>
-
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">2.3 Иконография</h3>
-          <div class="placeholder-block"><div class="placeholder-icon">⊞</div><div class="placeholder-label">Стиль иконок и библиотека</div><span class="badge badge-pending">Ожидает заполнения</span></div>
-        </div>
-
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">2.4 Фотостиль</h3>
-          <div class="placeholder-block"><div class="placeholder-icon">📷</div><div class="placeholder-label">Принципы фотографий, цветокоррекция, композиция</div><span class="badge badge-pending">Ожидает заполнения</span></div>
-        </div>
-
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">2.5 Паттерны & Текстуры</h3>
-          <p class="subsection-desc">Фирменные орнаменты — модульные знаки, диагональные сетки, текстуры сукна</p>
-          <div class="placeholder-block"><div class="placeholder-icon">⬡</div><div class="placeholder-label">Библиотека фирменных паттернов (#1–#6)</div><div class="placeholder-hint">Из элементов фирменной графики может быть разработана тематическая графика. Дополнительные знаки используются для паттернов и рекламных материалов.</div><span class="badge badge-pending">Ожидает заполнения</span></div>
-        </div>
-
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">2.6 Сетка & Лейауты</h3>
-          <div class="placeholder-block"><div class="placeholder-icon">⊡</div><div class="placeholder-label">Модульная сетка, отступы, responsive breakpoints</div><span class="badge badge-pending">Ожидает заполнения</span></div>
-        </div>
       </div>
-    </div>
 
-    <!-- ═══════ PAGE: LOGO & LOGOBOOK ═══════ -->
-    <div class="page-section" id="page-logo-usage" style="--chapter-color: var(--ch3-logo); --chapter-color-dim: var(--ch3-dim);">
-      <iframe
-        id="logobook-iframe"
-        src="background particles/LOGOBOOK/logobook.html"
-        class="logobook-fullpage-iframe"
-        style="
-          width: 100%;
-          border: none;
-          min-height: 100vh;
-          display: block;
-        "
-        onload="
-          try {
-            var body = this.contentDocument.body;
-            var html = this.contentDocument.documentElement;
-            var h = Math.max(body.scrollHeight, body.offsetHeight, html.clientHeight, html.scrollHeight, html.offsetHeight);
-            this.style.height = h + 'px';
-          } catch(e) {
-            this.style.height = '12000px';
-          }
-        "
-      ></iframe>
-    </div>
+      <!-- ═══════ PAGE: VISUAL SYSTEM ═══════ -->
+      <div class="page-section" id="page-visual-system"
+        style="--chapter-color: var(--ch2-visual-system); --chapter-color-dim: var(--ch2-dim);">
+        <iframe src="background particles/r02.html" class="section-particles-iframe"></iframe>
+        <div class="content-wrapper">
+          <div class="section-header">
+            <div class="section-eyebrow"><span>◐</span> Раздел 02</div>
+            <h1 class="section-title">Visual System</h1>
+            <p class="section-desc">Полная дизайн-система бренда — цвета, шрифты, иконки, фотостиль, паттерны</p>
+          </div>
 
-    <!-- ═══════ PAGE: MARKETING ═══════ -->
-    <div class="page-section" id="page-marketing" style="--chapter-color: var(--ch4-marketing); --chapter-color-dim: var(--ch4-dim);">
-      <iframe src="background particles/r04.html" class="section-particles-iframe"></iframe>
-      <div class="content-wrapper">
-        <div class="section-header">
-          <div class="section-eyebrow"><span>◈</span> Раздел 04</div>
-          <h1 class="section-title">Marketing Assets</h1>
-          <p class="section-desc">Маркетинговые материалы, социальные сети, рекламные форматы, мерч и фотоархив</p>
-        </div>
-        <div class="subsection fade-in-up"><h3 class="subsection-title">4.1 Социальные сети</h3><div class="placeholder-block"><div class="placeholder-icon">📱</div><div class="placeholder-label">Шаблоны для Instagram, VK, Telegram</div><span class="badge badge-pending">Ожидает заполнения</span></div></div>
-        <div class="subsection fade-in-up"><h3 class="subsection-title">4.2 Баннеры & Реклама</h3><div class="placeholder-block"><div class="placeholder-icon">🖼</div><div class="placeholder-label">Web-баннеры, наружная реклама, печатные объявления</div><span class="badge badge-pending">Ожидает заполнения</span></div></div>
-        <div class="subsection fade-in-up"><h3 class="subsection-title">4.3 POS-материалы</h3><div class="placeholder-block"><div class="placeholder-icon">🏷</div><div class="placeholder-label">Тейбл-тенты, прайс-листы, флаеры, стикеры</div><span class="badge badge-pending">Ожидает заполнения</span></div></div>
-        <div class="subsection fade-in-up"><h3 class="subsection-title">4.4 Мерч</h3><div class="placeholder-block"><div class="placeholder-icon">👕</div><div class="placeholder-label">Одежда, аксессуары, сувениры, упаковка</div><span class="badge badge-pending">Ожидает заполнения</span></div></div>
-        <div class="subsection fade-in-up"><h3 class="subsection-title">4.5 Фотоархив</h3><div class="placeholder-block"><div class="placeholder-icon">📸</div><div class="placeholder-label">Каталогизированная библиотека фотографий</div><span class="badge badge-pending">Ожидает заполнения</span></div></div>
-      </div>
-    </div>
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">2.1 Цветовая палитра</h3>
+            <p class="subsection-desc">Основные, акцентные и нейтральные цвета с кодировками Pantone / RGB / CMYK / HEX
+            </p>
+            <div class="swatch-grid">
+              <div class="swatch">
+                <div class="swatch-color" style="background: #1B2B5A;"></div>
+                <div class="swatch-info">
+                  <div class="swatch-name">Navy Deep</div>
+                  <div class="swatch-hex">#1B2B5A</div>
+                </div>
+              </div>
+              <div class="swatch">
+                <div class="swatch-color" style="background: #D4AF37;"></div>
+                <div class="swatch-info">
+                  <div class="swatch-name">Gold</div>
+                  <div class="swatch-hex">#D4AF37</div>
+                </div>
+              </div>
+              <div class="swatch">
+                <div class="swatch-color" style="background: #0C5A30;"></div>
+                <div class="swatch-info">
+                  <div class="swatch-name">Billiard Green</div>
+                  <div class="swatch-hex">#0C5A30</div>
+                </div>
+              </div>
+              <div class="swatch">
+                <div class="swatch-color" style="background: #F1F5F9;"></div>
+                <div class="swatch-info">
+                  <div class="swatch-name">Slate Light</div>
+                  <div class="swatch-hex">#F1F5F9</div>
+                </div>
+              </div>
+              <div class="swatch">
+                <div class="swatch-color" style="background: #111827;"></div>
+                <div class="swatch-info">
+                  <div class="swatch-name">Carbon</div>
+                  <div class="swatch-hex">#111827</div>
+                </div>
+              </div>
+            </div>
+            <div class="placeholder-block" style="margin-top: var(--space-6);">
+              <div class="placeholder-label">Полная палитра с Pantone/CMYK</div>
+              <div class="placeholder-hint">Требуется утверждение финальной палитры руководством. Dark mode варианты
+                включены.</div>
+              <span class="badge badge-pending">Ожидает финализации</span>
+            </div>
+          </div>
 
-    <!-- ═══════ PAGE: CORPORATE DOCS ═══════ -->
-    <div class="page-section" id="page-corporate" style="--chapter-color: var(--ch5-corporate); --chapter-color-dim: var(--ch5-dim);">
-      <iframe src="background particles/r05.html" class="section-particles-iframe"></iframe>
-      <div class="content-wrapper">
-        <div class="section-header">
-          <div class="section-eyebrow"><span>▣</span> Раздел 05</div>
-          <h1 class="section-title">Деловая документация</h1>
-          <p class="section-desc">ID-система: визитки, бланки, конверты, коммерческие предложения, шаблоны презентаций</p>
-        </div>
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">2.2 Типографика</h3>
+            <p class="subsection-desc">Шрифтовые пары, масштабная шкала, правила использования</p>
+            <div class="card-grid">
+              <div class="card">
+                <div
+                  style="font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--ch2-visual-system); margin-bottom: var(--space-3);">
+                  Шрифт 1 — Заголовки</div>
+                <div class="placeholder-block" style="min-height:100px;padding:var(--space-6);"><span
+                    class="badge badge-pending">Ожидает выбора</span></div>
+              </div>
+              <div class="card">
+                <div
+                  style="font-size: var(--text-xs); text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--ch2-visual-system); margin-bottom: var(--space-3);">
+                  Шрифт 2 — Основной текст</div>
+                <div class="placeholder-block" style="min-height:100px;padding:var(--space-6);"><span
+                    class="badge badge-pending">Ожидает выбора</span></div>
+              </div>
+            </div>
+          </div>
 
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">5.1 Визитные карточки</h3>
-          <p class="subsection-desc">4 варианта дизайна — корпоративная и именная карточка</p>
-          <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4);">
-            <div class="logobook-page" style="min-height:180px;"><span class="logobook-page-number">043</span><div class="logobook-page-section">ID</div><h4 class="logobook-page-title">Визитка — Вариант #1</h4><div class="placeholder-block" style="min-height:80px;padding:var(--space-4);"><div class="placeholder-label" style="font-size:var(--text-xs);">Насыщенный паттерн на обороте</div></div></div>
-            <div class="logobook-page" style="min-height:180px;"><span class="logobook-page-number">044</span><div class="logobook-page-section">ID</div><h4 class="logobook-page-title">Визитка — Вариант #2</h4><div class="placeholder-block" style="min-height:80px;padding:var(--space-4);"><div class="placeholder-label" style="font-size:var(--text-xs);">Линейный паттерн</div></div></div>
-            <div class="logobook-page" style="min-height:180px;"><span class="logobook-page-number">045</span><div class="logobook-page-section">ID</div><h4 class="logobook-page-title">Визитка — Вариант #3</h4><div class="placeholder-block" style="min-height:80px;padding:var(--space-4);"><div class="placeholder-label" style="font-size:var(--text-xs);">Мелкий регулярный паттерн</div></div></div>
-            <div class="logobook-page" style="min-height:180px;"><span class="logobook-page-number">046</span><div class="logobook-page-section">ID</div><h4 class="logobook-page-title">Визитка — Вариант #4</h4><div class="placeholder-block" style="min-height:80px;padding:var(--space-4);"><div class="placeholder-label" style="font-size:var(--text-xs);">Тёмный геометрический паттерн</div></div></div>
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">2.3 Иконография</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-icon">⊞</div>
+              <div class="placeholder-label">Стиль иконок и библиотека</div><span class="badge badge-pending">Ожидает
+                заполнения</span>
+            </div>
+          </div>
+
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">2.4 Фотостиль</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-icon">📷</div>
+              <div class="placeholder-label">Принципы фотографий, цветокоррекция, композиция</div><span
+                class="badge badge-pending">Ожидает заполнения</span>
+            </div>
+          </div>
+
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">2.5 Паттерны & Текстуры</h3>
+            <p class="subsection-desc">Фирменные орнаменты — модульные знаки, диагональные сетки, текстуры сукна</p>
+            <div class="placeholder-block">
+              <div class="placeholder-icon">⬡</div>
+              <div class="placeholder-label">Библиотека фирменных паттернов (#1–#6)</div>
+              <div class="placeholder-hint">Из элементов фирменной графики может быть разработана тематическая графика.
+                Дополнительные знаки используются для паттернов и рекламных материалов.</div><span
+                class="badge badge-pending">Ожидает заполнения</span>
+            </div>
+          </div>
+
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">2.6 Сетка & Лейауты</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-icon">⊡</div>
+              <div class="placeholder-label">Модульная сетка, отступы, responsive breakpoints</div><span
+                class="badge badge-pending">Ожидает заполнения</span>
+            </div>
           </div>
         </div>
-
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">5.2 Конверты</h3>
-          <div class="placeholder-block"><div class="placeholder-label">Конверт DL (220×110) · Конверт A4 (229×324) — 4 варианта дизайна</div><span class="badge badge-pending">Стр. 047–050</span></div>
-        </div>
-
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">5.3 Фирменные бланки</h3>
-          <div class="placeholder-block"><div class="placeholder-label">Бланк без реквизитов · Альтернативный · С контактами · С юр. реквизитами · Продолжение</div><span class="badge badge-pending">Стр. 051–056</span></div>
-        </div>
-
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">5.4 Коммерческое предложение</h3>
-          <div class="placeholder-block"><div class="placeholder-label">Шаблон ТКП: титул, нормативные документы, таблицы, сокращения</div><span class="badge badge-pending">Стр. 058–059</span></div>
-        </div>
-
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">5.5 Шаблон презентации</h3>
-          <div class="placeholder-block"><div class="placeholder-label">Титульный слайд · Варианты титула · Профиль компании · Продуктовые слайды</div><span class="badge badge-pending">Стр. 060–063</span></div>
-        </div>
       </div>
-    </div>
 
-    <!-- ═══════ PAGE: DIGITAL ═══════ -->
-    <div class="page-section" id="page-digital" style="--chapter-color: var(--ch6-digital); --chapter-color-dim: var(--ch6-dim);">
-      <iframe src="background particles/r06.html" class="section-particles-iframe"></iframe>
-      <div class="content-wrapper">
-        <div class="section-header">
-          <div class="section-eyebrow"><span>◎</span> Раздел 06</div>
-          <h1 class="section-title">Digital Presence</h1>
-          <p class="section-desc">Цифровое присутствие бренда — веб-сайт, email-шаблоны, онлайн-магазин</p>
-        </div>
-        <div class="subsection fade-in-up"><h3 class="subsection-title">6.1 Веб-сайт</h3><div class="placeholder-block"><div class="placeholder-icon">🌐</div><div class="placeholder-label">UI Kit, адаптивность, SEO-требования</div><div class="placeholder-hint">weekend-billiard.ru — текущий сайт компании, планируется редизайн</div><span class="badge badge-pending">Ожидает заполнения</span></div></div>
-        <div class="subsection fade-in-up"><h3 class="subsection-title">6.2 Email-шаблоны</h3><div class="placeholder-block"><div class="placeholder-icon">✉</div><div class="placeholder-label">Транзакционные, маркетинговые, автоматические</div><span class="badge badge-pending">Ожидает заполнения</span></div></div>
-        <div class="subsection fade-in-up"><h3 class="subsection-title">6.3 Подпись для сотрудников</h3><div class="placeholder-block"><div class="placeholder-icon">📧</div><div class="placeholder-label">Стандартная email-подпись с логотипом</div><span class="badge badge-pending">Ожидает заполнения</span></div></div>
-      </div>
-    </div>
+      <!-- ═══════ PAGE: LOGO & LOGOBOOK (Inline) ═══════ -->
+      <div class="page-section" id="page-logo-usage"
+        style="--chapter-color: var(--ch3-logo); --chapter-color-dim: var(--ch3-dim);">
+        <div class="content-wrapper logobook-inline" id="logobook-container">
+          <div class="section-header">
+            <div class="section-eyebrow"><span>⬡</span> Раздел 03</div>
+            <h1 class="section-title">Логотип & Logobook</h1>
+            <p class="section-desc">Токенизированная архитектура брендбука — разработка логотипа, вариации, правила
+              использования, фирменные носители</p>
+          </div>
 
-    <!-- ═══════ PAGE: PHYSICAL ═══════ -->
-    <div class="page-section" id="page-physical" style="--chapter-color: var(--ch7-physical); --chapter-color-dim: var(--ch7-dim);">
-      <iframe src="background particles/r07.html" class="section-particles-iframe"></iframe>
-      <div class="content-wrapper">
-        <div class="section-header">
-          <div class="section-eyebrow"><span>⬢</span> Раздел 07</div>
-          <h1 class="section-title">Физические носители</h1>
-          <p class="section-desc">Брендирование транспорта, форма сотрудников, вывески, сувенирная продукция, рекламные материалы</p>
-        </div>
-
-        <div class="subsection fade-in-up"><h3 class="subsection-title">7.1 Брендирование транспорта</h3><div class="placeholder-block"><div class="placeholder-label">Грузовой автомобиль · Седан · Микроавтобус — размещение логотипа и графики</div><span class="badge badge-pending">Стр. 125–131</span></div></div>
-
-        <div class="subsection fade-in-up"><h3 class="subsection-title">7.2 Форма сотрудников</h3><div class="placeholder-block"><div class="placeholder-label">Футболки · Бейджи · Шевроны / нашивки для подразделений</div><span class="badge badge-pending">Стр. 132–137</span></div></div>
-
-        <div class="subsection fade-in-up"><h3 class="subsection-title">7.3 Сувенирная продукция</h3><div class="placeholder-block"><div class="placeholder-label">Бумажные пакеты · Полиэтиленовые пакеты · Ручки / карандаши / флэшки · Кружки</div><span class="badge badge-pending">Стр. 138–142</span></div></div>
-
-        <div class="subsection fade-in-up"><h3 class="subsection-title">7.4 Рекламные материалы & Вывеска</h3><div class="placeholder-block"><div class="placeholder-label">Рекламные модули: 85×85, 120×175, A4 · Фасадная и интерьерная вывеска</div><span class="badge badge-pending">Стр. 143–147</span></div></div>
-      </div>
-    </div>
-
-    <!-- ═══════ PAGE: RESOURCES ═══════ -->
-    <div class="page-section" id="page-resources" style="--chapter-color: var(--ch8-resources); --chapter-color-dim: var(--ch8-dim);">
-      <iframe src="background particles/r08.html" class="section-particles-iframe"></iframe>
-      <div class="content-wrapper">
-        <div class="section-header">
-          <div class="section-eyebrow"><span>⤓</span> Раздел 08</div>
-          <h1 class="section-title">Ресурсы & Загрузки</h1>
-          <p class="section-desc">Файлы логотипов, шаблоны, гайды для подрядчиков, FAQ</p>
-        </div>
-        <div class="subsection fade-in-up">
-          <h3 class="subsection-title">8.1 Шаблоны для скачивания</h3>
-          <div class="card-grid">
-            <div class="card"><h5 style="margin-bottom:var(--space-2);">Логотипы</h5><p style="font-size:var(--text-sm);color:var(--color-text-tertiary);">SVG, PNG, AI, EPS</p><span class="badge badge-pending" style="margin-top:var(--space-3);">Скоро</span></div>
-            <div class="card"><h5 style="margin-bottom:var(--space-2);">Презентации</h5><p style="font-size:var(--text-sm);color:var(--color-text-tertiary);">PowerPoint, Keynote, Google Slides</p><span class="badge badge-pending" style="margin-top:var(--space-3);">Скоро</span></div>
-            <div class="card"><h5 style="margin-bottom:var(--space-2);">Соцсети</h5><p style="font-size:var(--text-sm);color:var(--color-text-tertiary);">Figma, PSD, Canva</p><span class="badge badge-pending" style="margin-top:var(--space-3);">Скоро</span></div>
-            <div class="card"><h5 style="margin-bottom:var(--space-2);">Документы</h5><p style="font-size:var(--text-sm);color:var(--color-text-tertiary);">Word, Google Docs</p><span class="badge badge-pending" style="margin-top:var(--space-3);">Скоро</span></div>
+          <div id="logobook-content"
+            style="min-height: 400px; display: flex; align-items: center; justify-content: center;">
+            <div style="text-align: center; color: var(--color-text-muted);">
+              <div style="font-size: 2rem; margin-bottom: var(--space-4);">⏳</div>
+              <div style="font-size: var(--text-sm);">Загрузка Logobook...</div>
+            </div>
           </div>
         </div>
-        <div class="subsection fade-in-up"><h3 class="subsection-title">8.2 Гайды</h3><div class="placeholder-block"><div class="placeholder-label">Быстрый старт · Гайд для подрядчиков · Гайд для PR и медиа · Checklist</div><span class="badge badge-pending">Ожидает заполнения</span></div></div>
-        <div class="subsection fade-in-up"><h3 class="subsection-title">8.3 FAQ</h3><div class="placeholder-block"><div class="placeholder-label">Часто задаваемые вопросы по использованию бренда</div><span class="badge badge-pending">Ожидает заполнения</span></div></div>
       </div>
-    </div>
 
-  </main>
+      <!-- ═══════ PAGE: MARKETING ═══════ -->
+      <div class="page-section" id="page-marketing"
+        style="--chapter-color: var(--ch4-marketing); --chapter-color-dim: var(--ch4-dim);">
+        <iframe src="background particles/r04.html" class="section-particles-iframe"></iframe>
+        <div class="content-wrapper">
+          <div class="section-header">
+            <div class="section-eyebrow"><span>◈</span> Раздел 04</div>
+            <h1 class="section-title">Marketing Assets</h1>
+            <p class="section-desc">Маркетинговые материалы, социальные сети, рекламные форматы, мерч и фотоархив</p>
+          </div>
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">4.1 Социальные сети</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-icon">📱</div>
+              <div class="placeholder-label">Шаблоны для Instagram, VK, Telegram</div><span
+                class="badge badge-pending">Ожидает заполнения</span>
+            </div>
+          </div>
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">4.2 Баннеры & Реклама</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-icon">🖼</div>
+              <div class="placeholder-label">Web-баннеры, наружная реклама, печатные объявления</div><span
+                class="badge badge-pending">Ожидает заполнения</span>
+            </div>
+          </div>
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">4.3 POS-материалы</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-icon">🏷</div>
+              <div class="placeholder-label">Тейбл-тенты, прайс-листы, флаеры, стикеры</div><span
+                class="badge badge-pending">Ожидает заполнения</span>
+            </div>
+          </div>
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">4.4 Мерч</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-icon">👕</div>
+              <div class="placeholder-label">Одежда, аксессуары, сувениры, упаковка</div><span
+                class="badge badge-pending">Ожидает заполнения</span>
+            </div>
+          </div>
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">4.5 Фотоархив</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-icon">📸</div>
+              <div class="placeholder-label">Каталогизированная библиотека фотографий</div><span
+                class="badge badge-pending">Ожидает заполнения</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-</div>
+      <!-- ═══════ PAGE: CORPORATE DOCS ═══════ -->
+      <div class="page-section" id="page-corporate"
+        style="--chapter-color: var(--ch5-corporate); --chapter-color-dim: var(--ch5-dim);">
+        <iframe src="background particles/r05.html" class="section-particles-iframe"></iframe>
+        <div class="content-wrapper">
+          <div class="section-header">
+            <div class="section-eyebrow"><span>▣</span> Раздел 05</div>
+            <h1 class="section-title">Деловая документация</h1>
+            <p class="section-desc">ID-система: визитки, бланки, конверты, коммерческие предложения, шаблоны презентаций
+            </p>
+          </div>
 
-<!-- ════════════════ SCRIPTS ════════════════ -->
-<script>
-/* ── Navigation ── */
-function navigateTo(pageId) {
-  document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">5.1 Визитные карточки</h3>
+            <p class="subsection-desc">4 варианта дизайна — корпоративная и именная карточка</p>
+            <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4);">
+              <div class="logobook-page" style="min-height:180px;"><span class="logobook-page-number">043</span>
+                <div class="logobook-page-section">ID</div>
+                <h4 class="logobook-page-title">Визитка — Вариант #1</h4>
+                <div class="placeholder-block" style="min-height:80px;padding:var(--space-4);">
+                  <div class="placeholder-label" style="font-size:var(--text-xs);">Насыщенный паттерн на обороте</div>
+                </div>
+              </div>
+              <div class="logobook-page" style="min-height:180px;"><span class="logobook-page-number">044</span>
+                <div class="logobook-page-section">ID</div>
+                <h4 class="logobook-page-title">Визитка — Вариант #2</h4>
+                <div class="placeholder-block" style="min-height:80px;padding:var(--space-4);">
+                  <div class="placeholder-label" style="font-size:var(--text-xs);">Линейный паттерн</div>
+                </div>
+              </div>
+              <div class="logobook-page" style="min-height:180px;"><span class="logobook-page-number">045</span>
+                <div class="logobook-page-section">ID</div>
+                <h4 class="logobook-page-title">Визитка — Вариант #3</h4>
+                <div class="placeholder-block" style="min-height:80px;padding:var(--space-4);">
+                  <div class="placeholder-label" style="font-size:var(--text-xs);">Мелкий регулярный паттерн</div>
+                </div>
+              </div>
+              <div class="logobook-page" style="min-height:180px;"><span class="logobook-page-number">046</span>
+                <div class="logobook-page-section">ID</div>
+                <h4 class="logobook-page-title">Визитка — Вариант #4</h4>
+                <div class="placeholder-block" style="min-height:80px;padding:var(--space-4);">
+                  <div class="placeholder-label" style="font-size:var(--text-xs);">Тёмный геометрический паттерн</div>
+                </div>
+              </div>
+            </div>
+          </div>
 
-  const page = document.getElementById('page-' + pageId);
-  if (page) {
-    page.classList.add('active');
-    page.querySelectorAll('.fade-in-up').forEach((el, i) => {
-      setTimeout(() => el.classList.add('visible'), 80 * i);
-    });
-  }
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">5.2 Конверты</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-label">Конверт DL (220×110) · Конверт A4 (229×324) — 4 варианта дизайна</div><span
+                class="badge badge-pending">Стр. 047–050</span>
+            </div>
+          </div>
 
-  const navItem = document.querySelector(`.nav-item[data-page="${pageId}"]`);
-  if (navItem) navItem.classList.add('active');
-  
-  // Handle submenu
-  const logobookSubmenu = document.getElementById('logobookSubmenu');
-  if (logobookSubmenu) {
-    if (pageId === 'logo-usage') {
-      logobookSubmenu.style.display = 'block';
-    } else {
-      logobookSubmenu.style.display = 'none';
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">5.3 Фирменные бланки</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-label">Бланк без реквизитов · Альтернативный · С контактами · С юр. реквизитами ·
+                Продолжение</div><span class="badge badge-pending">Стр. 051–056</span>
+            </div>
+          </div>
+
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">5.4 Коммерческое предложение</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-label">Шаблон ТКП: титул, нормативные документы, таблицы, сокращения</div><span
+                class="badge badge-pending">Стр. 058–059</span>
+            </div>
+          </div>
+
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">5.5 Шаблон презентации</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-label">Титульный слайд · Варианты титула · Профиль компании · Продуктовые слайды
+              </div><span class="badge badge-pending">Стр. 060–063</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ PAGE: DIGITAL ═══════ -->
+      <div class="page-section" id="page-digital"
+        style="--chapter-color: var(--ch6-digital); --chapter-color-dim: var(--ch6-dim);">
+        <iframe src="background particles/r06.html" class="section-particles-iframe"></iframe>
+        <div class="content-wrapper">
+          <div class="section-header">
+            <div class="section-eyebrow"><span>◎</span> Раздел 06</div>
+            <h1 class="section-title">Digital Presence</h1>
+            <p class="section-desc">Цифровое присутствие бренда — веб-сайт, email-шаблоны, онлайн-магазин</p>
+          </div>
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">6.1 Веб-сайт</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-icon">🌐</div>
+              <div class="placeholder-label">UI Kit, адаптивность, SEO-требования</div>
+              <div class="placeholder-hint">weekend-billiard.ru — текущий сайт компании, планируется редизайн</div><span
+                class="badge badge-pending">Ожидает заполнения</span>
+            </div>
+          </div>
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">6.2 Email-шаблоны</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-icon">✉</div>
+              <div class="placeholder-label">Транзакционные, маркетинговые, автоматические</div><span
+                class="badge badge-pending">Ожидает заполнения</span>
+            </div>
+          </div>
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">6.3 Подпись для сотрудников</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-icon">📧</div>
+              <div class="placeholder-label">Стандартная email-подпись с логотипом</div><span
+                class="badge badge-pending">Ожидает заполнения</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ PAGE: PHYSICAL ═══════ -->
+      <div class="page-section" id="page-physical"
+        style="--chapter-color: var(--ch7-physical); --chapter-color-dim: var(--ch7-dim);">
+        <iframe src="background particles/r07.html" class="section-particles-iframe"></iframe>
+        <div class="content-wrapper">
+          <div class="section-header">
+            <div class="section-eyebrow"><span>⬢</span> Раздел 07</div>
+            <h1 class="section-title">Физические носители</h1>
+            <p class="section-desc">Брендирование транспорта, форма сотрудников, вывески, сувенирная продукция,
+              рекламные материалы</p>
+          </div>
+
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">7.1 Брендирование транспорта</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-label">Грузовой автомобиль · Седан · Микроавтобус — размещение логотипа и графики
+              </div><span class="badge badge-pending">Стр. 125–131</span>
+            </div>
+          </div>
+
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">7.2 Форма сотрудников</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-label">Футболки · Бейджи · Шевроны / нашивки для подразделений</div><span
+                class="badge badge-pending">Стр. 132–137</span>
+            </div>
+          </div>
+
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">7.3 Сувенирная продукция</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-label">Бумажные пакеты · Полиэтиленовые пакеты · Ручки / карандаши / флэшки ·
+                Кружки</div><span class="badge badge-pending">Стр. 138–142</span>
+            </div>
+          </div>
+
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">7.4 Рекламные материалы & Вывеска</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-label">Рекламные модули: 85×85, 120×175, A4 · Фасадная и интерьерная вывеска</div>
+              <span class="badge badge-pending">Стр. 143–147</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ PAGE: RESOURCES ═══════ -->
+      <div class="page-section" id="page-resources"
+        style="--chapter-color: var(--ch8-resources); --chapter-color-dim: var(--ch8-dim);">
+        <iframe src="background particles/r08.html" class="section-particles-iframe"></iframe>
+        <div class="content-wrapper">
+          <div class="section-header">
+            <div class="section-eyebrow"><span>⤓</span> Раздел 08</div>
+            <h1 class="section-title">Ресурсы & Загрузки</h1>
+            <p class="section-desc">Файлы логотипов, шаблоны, гайды для подрядчиков, FAQ</p>
+          </div>
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">8.1 Шаблоны для скачивания</h3>
+            <div class="card-grid">
+              <div class="card">
+                <h5 style="margin-bottom:var(--space-2);">Логотипы</h5>
+                <p style="font-size:var(--text-sm);color:var(--color-text-tertiary);">SVG, PNG, AI, EPS</p><span
+                  class="badge badge-pending" style="margin-top:var(--space-3);">Скоро</span>
+              </div>
+              <div class="card">
+                <h5 style="margin-bottom:var(--space-2);">Презентации</h5>
+                <p style="font-size:var(--text-sm);color:var(--color-text-tertiary);">PowerPoint, Keynote, Google Slides
+                </p><span class="badge badge-pending" style="margin-top:var(--space-3);">Скоро</span>
+              </div>
+              <div class="card">
+                <h5 style="margin-bottom:var(--space-2);">Соцсети</h5>
+                <p style="font-size:var(--text-sm);color:var(--color-text-tertiary);">Figma, PSD, Canva</p><span
+                  class="badge badge-pending" style="margin-top:var(--space-3);">Скоро</span>
+              </div>
+              <div class="card">
+                <h5 style="margin-bottom:var(--space-2);">Документы</h5>
+                <p style="font-size:var(--text-sm);color:var(--color-text-tertiary);">Word, Google Docs</p><span
+                  class="badge badge-pending" style="margin-top:var(--space-3);">Скоро</span>
+              </div>
+            </div>
+          </div>
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">8.2 Гайды</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-label">Быстрый старт · Гайд для подрядчиков · Гайд для PR и медиа · Checklist
+              </div><span class="badge badge-pending">Ожидает заполнения</span>
+            </div>
+          </div>
+          <div class="subsection fade-in-up">
+            <h3 class="subsection-title">8.3 FAQ</h3>
+            <div class="placeholder-block">
+              <div class="placeholder-label">Часто задаваемые вопросы по использованию бренда</div><span
+                class="badge badge-pending">Ожидает заполнения</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- ════════════════ SCRIPTS ════════════════ -->
+  <script>
+    /* ── Navigation is now handled by js/animations.js ── */
+
+    function navigateIframe(pageId, hash) {
+      navigateTo(pageId);
+
+      // Highlight active submenu item
       document.querySelectorAll('.submenu-item').forEach(n => n.classList.remove('active'));
-    }
-  }
+      const activeItem = Array.from(document.querySelectorAll('.submenu-item')).find(el => el.getAttribute('onclick').includes(hash));
+      if (activeItem) activeItem.classList.add('active');
 
-  const titles = {
-    'dashboard': 'Главная',
-    'brand-identity': 'Brand Identity',
-    'visual-system': 'Visual System',
-    'logo-usage': 'Логотип & Logobook',
-    'marketing': 'Marketing Assets',
-    'corporate': 'Деловая документация',
-    'digital': 'Digital Presence',
-    'physical': 'Физические носители',
-    'resources': 'Ресурсы & Загрузки'
-  };
-  document.getElementById('breadcrumbCurrent').textContent = titles[pageId] || pageId;
-  document.getElementById('appMain').scrollTo({ top: 0, behavior: 'smooth' });
-
-  // Reinit particles for the new section
-  initSectionParticles(pageId);
-}
-
-function navigateIframe(pageId, hash) {
-  navigateTo(pageId);
-  
-  // Highlight active submenu item
-  document.querySelectorAll('.submenu-item').forEach(n => n.classList.remove('active'));
-  const activeItem = Array.from(document.querySelectorAll('.submenu-item')).find(el => el.getAttribute('onclick').includes(hash));
-  if (activeItem) activeItem.classList.add('active');
-  
-  // Send message to iframe to scroll
-  const iframe = document.querySelector('#page-logo-usage iframe');
-  if (iframe && iframe.contentWindow) {
-    iframe.contentWindow.postMessage({ type: 'navigate', hash: hash }, '*');
-  }
-}
-
-function handleSearch(query) {
-  // Simplified search highlighting
-  const q = query.toLowerCase().trim();
-  if (!q) return;
-  const pages = ['brand-identity','visual-system','logo-usage','marketing','corporate','digital','physical','resources'];
-  for (const pid of pages) {
-    const page = document.getElementById('page-' + pid);
-    if (page && page.textContent.toLowerCase().includes(q)) {
-      navigateTo(pid);
-      break;
-    }
-  }
-}
-
-function toggleSidebar() {
-  const sidebar = document.getElementById('sidebar');
-  sidebar.style.display = sidebar.style.display === 'none' ? 'flex' : 'none';
-}
-
-/* ── Particle System ── */
-const chapterColors = {
-  'dashboard': { r: 0, g: 119, b: 182 },
-  '1': { r: 99, g: 102, b: 241 },
-  '2': { r: 139, g: 92, b: 246 },
-  '3': { r: 212, g: 175, b: 55 },
-  '4': { r: 244, g: 63, b: 94 },
-  '5': { r: 59, g: 130, b: 246 },
-  '6': { r: 6, g: 182, b: 212 },
-  '7': { r: 245, g: 158, b: 11 },
-  '8': { r: 16, g: 185, b: 129 }
-};
-
-class ParticleField {
-  constructor(canvas, color, count = 60) {
-    this.canvas = canvas;
-    this.ctx = canvas.getContext('2d');
-    this.particles = [];
-    this.mouse = { x: -1000, y: -1000 };
-    this.color = color;
-    this.count = count;
-    this.running = false;
-    this.resize();
-    this.init();
-  }
-  resize() {
-    const rect = this.canvas.parentElement.getBoundingClientRect();
-    this.canvas.width = rect.width;
-    this.canvas.height = rect.height;
-  }
-  init() {
-    this.particles = [];
-    for (let i = 0; i < this.count; i++) {
-      this.particles.push({
-        x: Math.random() * this.canvas.width,
-        y: Math.random() * this.canvas.height,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        r: Math.random() * 2 + 0.5,
-        a: Math.random() * 0.3 + 0.05
-      });
-    }
-  }
-  start() {
-    if (this.running) return;
-    this.running = true;
-    this.canvas.addEventListener('mousemove', this._onMouse = (e) => {
-      const rect = this.canvas.getBoundingClientRect();
-      this.mouse.x = e.clientX - rect.left;
-      this.mouse.y = e.clientY - rect.top;
-    });
-    this.canvas.addEventListener('mouseleave', this._onLeave = () => {
-      this.mouse.x = -1000;
-      this.mouse.y = -1000;
-    });
-    this.loop();
-  }
-  stop() {
-    this.running = false;
-    if (this._onMouse) this.canvas.removeEventListener('mousemove', this._onMouse);
-    if (this._onLeave) this.canvas.removeEventListener('mouseleave', this._onLeave);
-  }
-  loop() {
-    if (!this.running) return;
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    const c = this.color;
-
-    for (const p of this.particles) {
-      // Mouse interaction
-      const dx = this.mouse.x - p.x;
-      const dy = this.mouse.y - p.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 150) {
-        const force = (150 - dist) / 150;
-        p.vx -= dx * force * 0.002;
-        p.vy -= dy * force * 0.002;
+      // Send message to iframe to scroll
+      const iframe = document.querySelector('#page-logo-usage iframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'navigate', hash: hash }, '*');
       }
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vx *= 0.99;
-      p.vy *= 0.99;
-
-      // Wrap
-      if (p.x < 0) p.x = this.canvas.width;
-      if (p.x > this.canvas.width) p.x = 0;
-      if (p.y < 0) p.y = this.canvas.height;
-      if (p.y > this.canvas.height) p.y = 0;
-
-      // Draw
-      this.ctx.beginPath();
-      this.ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      this.ctx.fillStyle = `rgba(${c.r},${c.g},${c.b},${p.a})`;
-      this.ctx.fill();
     }
 
-    // Lines
-    for (let i = 0; i < this.particles.length; i++) {
-      for (let j = i + 1; j < this.particles.length; j++) {
-        const a = this.particles[i];
-        const b = this.particles[j];
-        const d = Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
-        if (d < 120) {
-          this.ctx.beginPath();
-          this.ctx.moveTo(a.x, a.y);
-          this.ctx.lineTo(b.x, b.y);
-          this.ctx.strokeStyle = `rgba(${c.r},${c.g},${c.b},${0.06 * (1 - d / 120)})`;
-          this.ctx.lineWidth = 0.5;
-          this.ctx.stroke();
+    function handleSearch(query) {
+      // Simplified search highlighting
+      const q = query.toLowerCase().trim();
+      if (!q) return;
+      const pages = ['brand-identity', 'visual-system', 'logo-usage', 'marketing', 'corporate', 'digital', 'physical', 'resources'];
+      for (const pid of pages) {
+        const page = document.getElementById('page-' + pid);
+        if (page && page.textContent.toLowerCase().includes(q)) {
+          navigateTo(pid);
+          break;
         }
       }
     }
 
-    requestAnimationFrame(() => this.loop());
-  }
-}
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.style.display = sidebar.style.display === 'none' ? 'flex' : 'none';
+    }
 
-let activeParticleField = null;
+    /* ── Particle System ── */
+    const chapterColors = {
+      'dashboard': { r: 0, g: 119, b: 182 },
+      '1': { r: 99, g: 102, b: 241 },
+      '2': { r: 139, g: 92, b: 246 },
+      '3': { r: 212, g: 175, b: 55 },
+      '4': { r: 244, g: 63, b: 94 },
+      '5': { r: 59, g: 130, b: 246 },
+      '6': { r: 6, g: 182, b: 212 },
+      '7': { r: 245, g: 158, b: 11 },
+      '8': { r: 16, g: 185, b: 129 }
+    };
 
-function initSectionParticles(pageId) {
-  if (activeParticleField) {
-    activeParticleField.stop();
-    activeParticleField = null;
-  }
+    class ParticleField {
+      constructor(canvas, color, count = 60) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.particles = [];
+        this.mouse = { x: -1000, y: -1000 };
+        this.color = color;
+        this.count = count;
+        this.running = false;
+        this.resize();
+        this.init();
+      }
+      resize() {
+        const rect = this.canvas.parentElement.getBoundingClientRect();
+        this.canvas.width = rect.width;
+        this.canvas.height = rect.height;
+      }
+      init() {
+        this.particles = [];
+        for (let i = 0; i < this.count; i++) {
+          this.particles.push({
+            x: Math.random() * this.canvas.width,
+            y: Math.random() * this.canvas.height,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            r: Math.random() * 2 + 0.5,
+            a: Math.random() * 0.3 + 0.05
+          });
+        }
+      }
+      start() {
+        if (this.running) return;
+        this.running = true;
+        this.canvas.addEventListener('mousemove', this._onMouse = (e) => {
+          const rect = this.canvas.getBoundingClientRect();
+          this.mouse.x = e.clientX - rect.left;
+          this.mouse.y = e.clientY - rect.top;
+        });
+        this.canvas.addEventListener('mouseleave', this._onLeave = () => {
+          this.mouse.x = -1000;
+          this.mouse.y = -1000;
+        });
+        this.loop();
+      }
+      stop() {
+        this.running = false;
+        if (this._onMouse) this.canvas.removeEventListener('mousemove', this._onMouse);
+        if (this._onLeave) this.canvas.removeEventListener('mouseleave', this._onLeave);
+      }
+      loop() {
+        if (!this.running) return;
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        const c = this.color;
 
-  let canvas, colorKey;
-  if (pageId === 'dashboard') {
-    canvas = document.getElementById('particlesCanvas');
-    colorKey = 'dashboard';
-  } else {
-    const page = document.getElementById('page-' + pageId);
-    canvas = page ? page.querySelector('.section-particles') : null;
-    const ch = canvas ? canvas.getAttribute('data-chapter') : null;
-    colorKey = ch || 'dashboard';
-  }
+        for (const p of this.particles) {
+          // Mouse interaction
+          const dx = this.mouse.x - p.x;
+          const dy = this.mouse.y - p.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 150) {
+            const force = (150 - dist) / 150;
+            p.vx -= dx * force * 0.002;
+            p.vy -= dy * force * 0.002;
+          }
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vx *= 0.99;
+          p.vy *= 0.99;
 
-  if (canvas && chapterColors[colorKey]) {
-    const pf = new ParticleField(canvas, chapterColors[colorKey], pageId === 'dashboard' ? 80 : 40);
-    pf.start();
-    activeParticleField = pf;
-  }
-}
+          // Wrap
+          if (p.x < 0) p.x = this.canvas.width;
+          if (p.x > this.canvas.width) p.x = 0;
+          if (p.y < 0) p.y = this.canvas.height;
+          if (p.y > this.canvas.height) p.y = 0;
 
-/* ── Init ── */
-window.addEventListener('DOMContentLoaded', () => {
-  initSectionParticles('dashboard');
+          // Draw
+          this.ctx.beginPath();
+          this.ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          this.ctx.fillStyle = `rgba(${c.r},${c.g},${c.b},${p.a})`;
+          this.ctx.fill();
+        }
 
-  // Intersection Observer for fade-in animations
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: 0.1 });
+        // Lines
+        for (let i = 0; i < this.particles.length; i++) {
+          for (let j = i + 1; j < this.particles.length; j++) {
+            const a = this.particles[i];
+            const b = this.particles[j];
+            const d = Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+            if (d < 120) {
+              this.ctx.beginPath();
+              this.ctx.moveTo(a.x, a.y);
+              this.ctx.lineTo(b.x, b.y);
+              this.ctx.strokeStyle = `rgba(${c.r},${c.g},${c.b},${0.06 * (1 - d / 120)})`;
+              this.ctx.lineWidth = 0.5;
+              this.ctx.stroke();
+            }
+          }
+        }
 
-  document.querySelectorAll('#page-dashboard .fade-in-up').forEach(el => observer.observe(el));
-});
+        requestAnimationFrame(() => this.loop());
+      }
+    }
 
-window.addEventListener('resize', () => {
-  if (activeParticleField) activeParticleField.resize();
-});
+    let activeParticleField = null;
 
-function toggleParticles(isVisible) {
-  if (isVisible) {
-    document.body.classList.remove('particles-hidden');
-  } else {
-    document.body.classList.add('particles-hidden');
-  }
-}
-</script>
+    function initSectionParticles(pageId) {
+      if (activeParticleField) {
+        activeParticleField.stop();
+        activeParticleField = null;
+      }
+
+      let canvas, colorKey;
+      if (pageId === 'dashboard') {
+        canvas = document.getElementById('particlesCanvas');
+        colorKey = 'dashboard';
+      } else {
+        const page = document.getElementById('page-' + pageId);
+        canvas = page ? page.querySelector('.section-particles') : null;
+        const ch = canvas ? canvas.getAttribute('data-chapter') : null;
+        colorKey = ch || 'dashboard';
+      }
+
+      if (canvas && chapterColors[colorKey]) {
+        const pf = new ParticleField(canvas, chapterColors[colorKey], pageId === 'dashboard' ? 80 : 40);
+        pf.start();
+        activeParticleField = pf;
+      }
+    }
+
+    /* ── Init ── */
+    window.addEventListener('DOMContentLoaded', () => {
+      initSectionParticles('dashboard');
+
+      // Intersection Observer for fade-in animations
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('#page-dashboard .fade-in-up').forEach(el => observer.observe(el));
+    });
+
+    window.addEventListener('resize', () => {
+      if (activeParticleField) activeParticleField.resize();
+    });
+
+    function toggleParticles(isVisible) {
+      if (isVisible) {
+        document.body.classList.remove('particles-hidden');
+      } else {
+        document.body.classList.add('particles-hidden');
+      }
+    }
+
+    /* ── Theme Toggle Logic ── */
+    const sunSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+    const moonSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+    
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('wb-theme', next);
+      document.getElementById('themeIcon').innerHTML = next === 'dark' ? moonSvg : sunSvg;
+    }
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = document.documentElement.getAttribute('data-theme') || 'light';
+      document.getElementById('themeIcon').innerHTML = saved === 'dark' ? moonSvg : sunSvg;
+    });
+
+    /* ── UI Rendering: Comments logic moved to js/comments.js ── */
+
+    // Hook into existing init
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.renderUploadZones) renderUploadZones();
+      if (window.injectCommentPanel) injectCommentPanel();
+    });
+
+  </script>
+
+  <input type="file" id="fileInput" style="display:none;" multiple onchange="console.log('File selected:', this.files)">
+
 
 
 </body>
+
 </html>
