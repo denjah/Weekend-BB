@@ -246,11 +246,11 @@
 
     <!-- ════════════════ HEADER ════════════════ -->
     <style>
-      body.particles-hidden iframe[src*="background particles"] {
+      body.particles-hidden .section-particles-iframe {
         opacity: 0 !important;
       }
 
-      iframe[src*="background particles"] {
+      .section-particles-iframe {
         transition: opacity 0.4s ease !important;
       }
 
@@ -351,9 +351,9 @@
       <div class="page-section active" id="page-dashboard"
         style="position: relative; min-height: 100vh; background: #f0f2f5; --color-text-primary: #1B2B5A; --color-text-secondary: #444; --bg-surface: rgba(255,255,255,0.85); --line: rgba(0,0,0,0.08); overflow: hidden;">
         <!-- Общий фон с частицами -->
-        <iframe src="background particles/logo_txt_rott_01_white.html"
+        <iframe src="background particles/logo_txt_rott_01_white.html" class="section-particles-iframe"
           style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: none; pointer-events: none; z-index: 0;"></iframe>
-        <iframe src="background particles/logo_znak_rott_01_white.html"
+        <iframe src="background particles/logo_znak_rott_01_white.html" class="section-particles-iframe"
           style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; border: none; pointer-events: none; z-index: 0;"></iframe>
 
         <div class="content-wrapper" style="position: relative; z-index: 1;">

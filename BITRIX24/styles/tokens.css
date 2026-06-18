@@ -1,0 +1,236 @@
+/* ============================================================
+   WEEKEND BILLIARD — BRANDBOOK PORTAL
+   Design Tokens v2.0 — Dual Theme System
+   Light theme: corporate / white
+   Dark theme: derived from Logobook palette
+   ============================================================ */
+
+:root {
+  /* ── Brand Core Colors (Light Theme) ── */
+  --color-bg-primary: #F8FAFC;
+  --color-bg-secondary: #FFFFFF;
+  --color-bg-tertiary: #F1F5F9;
+  --color-bg-card: #FFFFFF;
+  --color-bg-card-hover: #F8FAFC;
+  --color-bg-overlay: rgba(255, 255, 255, 0.85);
+  --color-bg-sidebar: #FFFFFF;
+
+  --color-text-primary: #0F172A;
+  --color-text-secondary: #334155;
+  --color-text-tertiary: #475569;
+  --color-text-muted: #64748B;
+
+  --color-accent-gold: #0077B6;
+  --color-accent-gold-dim: rgba(0, 119, 182, 0.15);
+  --color-accent-gold-glow: rgba(0, 119, 182, 0.3);
+
+  --color-emerald: #0C5A30;
+  --color-emerald-bright: #10B981;
+  --color-emerald-dim: rgba(16, 185, 129, 0.12);
+
+  --color-border: rgba(15, 23, 42, 0.08);
+  --color-border-hover: rgba(15, 23, 42, 0.15);
+  --color-border-active: rgba(0, 119, 182, 0.3);
+
+  /* ── Upload Zone Colors ── */
+  --color-upload-bg: rgba(0, 119, 182, 0.04);
+  --color-upload-border: rgba(0, 119, 182, 0.2);
+  --color-upload-border-active: rgba(0, 119, 182, 0.5);
+  --color-upload-icon: #0077B6;
+
+  /* ── Comment Colors ── */
+  --color-comment-bg: #F8FAFC;
+  --color-comment-border: rgba(15, 23, 42, 0.06);
+  --color-comment-author: #0F172A;
+  --color-comment-time: #94A3B8;
+
+  /* ── Status Badges ── */
+  --color-status-pending-bg: rgba(245, 158, 11, 0.12);
+  --color-status-pending: #F59E0B;
+  --color-status-ready-bg: rgba(16, 185, 129, 0.12);
+  --color-status-ready: #10B981;
+  --color-status-new-bg: rgba(239, 68, 68, 0.12);
+  --color-status-new: #EF4444;
+  --color-status-review-bg: rgba(99, 102, 241, 0.12);
+  --color-status-review: #6366F1;
+
+  /* ── Chapter Color Index ── */
+  --ch1-brand-identity: #6366F1;
+  --ch2-visual-system: #8B5CF6;
+  --ch3-logo: #D4AF37;
+  --ch4-marketing: #F43F5E;
+  --ch5-corporate: #3B82F6;
+  --ch6-digital: #06B6D4;
+  --ch7-physical: #F59E0B;
+  --ch8-resources: #10B981;
+
+  --ch1-dim: rgba(99, 102, 241, 0.12);
+  --ch2-dim: rgba(139, 92, 246, 0.12);
+  --ch3-dim: rgba(212, 175, 55, 0.12);
+  --ch4-dim: rgba(244, 63, 94, 0.12);
+  --ch5-dim: rgba(59, 130, 246, 0.12);
+  --ch6-dim: rgba(6, 182, 212, 0.12);
+  --ch7-dim: rgba(245, 158, 11, 0.12);
+  --ch8-dim: rgba(16, 185, 129, 0.12);
+
+  /* ── Typography ── */
+  --font-display: 'Clash Display', 'Outfit', sans-serif;
+  --font-heading: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --font-body: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --text-xs: 0.6875rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: 3rem;
+  --text-5xl: 4rem;
+
+  --leading-tight: 1.15;
+  --leading-snug: 1.3;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.8;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.05em;
+  --tracking-caps: 0.12em;
+
+  /* ── Spacing ── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* ── Layout ── */
+  --sidebar-width: 280px;
+  --sidebar-collapsed: 60px;
+  --header-height: 64px;
+  --content-max: 1080px;
+  --comment-panel-width: 380px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ── Z-Index Scale ── */
+  --z-particles: 0;
+  --z-content: 1;
+  --z-card: 10;
+  --z-sidebar: 200;
+  --z-header: 100;
+  --z-dropdown: 300;
+  --z-comment-panel: 400;
+  --z-modal: 500;
+  --z-toast: 600;
+
+  /* ── Motion ── */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --duration-glacial: 800ms;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  --shadow-glow-gold: 0 0 20px rgba(212,175,55,0.15);
+  --shadow-glow-chapter: 0 0 20px var(--chapter-color-dim, rgba(212,175,55,0.1));
+
+  /* ── Particle opacity (30% less by default) ── */
+  --particle-opacity: 0.28;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DARK THEME — Derived from Logobook Palette
+   ══════════════════════════════════════════════════════════════ */
+:root[data-theme="dark"] {
+  --color-bg-primary: #08090b;
+  --color-bg-secondary: #101218;
+  --color-bg-tertiary: #181a22;
+  --color-bg-card: rgba(255,255,255,0.055);
+  --color-bg-card-hover: rgba(255,255,255,0.085);
+  --color-bg-overlay: rgba(8, 9, 11, 0.92);
+  --color-bg-sidebar: #0a0c10;
+
+  --color-text-primary: #f2f0ea;
+  --color-text-secondary: rgba(242,240,234,0.80);
+  --color-text-tertiary: rgba(242,240,234,0.64);
+  --color-text-muted: rgba(242,240,234,0.42);
+
+  --color-accent-gold: #d7ff73;
+  --color-accent-gold-dim: rgba(215,255,115,0.12);
+  --color-accent-gold-glow: rgba(215,255,115,0.25);
+
+  --color-emerald-bright: #72ffb8;
+  --color-emerald-dim: rgba(114,255,184,0.12);
+
+  --color-border: rgba(255,255,255,0.10);
+  --color-border-hover: rgba(255,255,255,0.18);
+  --color-border-active: rgba(215,255,115,0.3);
+
+  /* ── Upload Zone (Dark) ── */
+  --color-upload-bg: rgba(215,255,115,0.04);
+  --color-upload-border: rgba(215,255,115,0.15);
+  --color-upload-border-active: rgba(215,255,115,0.4);
+  --color-upload-icon: #d7ff73;
+
+  /* ── Comments (Dark) ── */
+  --color-comment-bg: rgba(255,255,255,0.04);
+  --color-comment-border: rgba(255,255,255,0.08);
+  --color-comment-author: #f2f0ea;
+  --color-comment-time: rgba(242,240,234,0.42);
+
+  /* ── Status Badges (Dark) ── */
+  --color-status-pending-bg: rgba(255,228,114,0.12);
+  --color-status-pending: #ffe472;
+  --color-status-ready-bg: rgba(114,255,184,0.12);
+  --color-status-ready: #72ffb8;
+  --color-status-new-bg: rgba(255,138,114,0.12);
+  --color-status-new: #ff8a72;
+  --color-status-review-bg: rgba(168,114,255,0.12);
+  --color-status-review: #a872ff;
+
+  /* ── Chapter Colors (Dark — brighter for contrast) ── */
+  --ch1-brand-identity: #818cf8;
+  --ch2-visual-system: #a78bfa;
+  --ch3-logo: #d7ff73;
+  --ch4-marketing: #ff8a72;
+  --ch5-corporate: #8dd7ff;
+  --ch6-digital: #72ffb8;
+  --ch7-physical: #ffe472;
+  --ch8-resources: #72ffb8;
+
+  --ch1-dim: rgba(129,140,248,0.15);
+  --ch2-dim: rgba(167,139,250,0.15);
+  --ch3-dim: rgba(215,255,115,0.12);
+  --ch4-dim: rgba(255,138,114,0.12);
+  --ch5-dim: rgba(141,215,255,0.12);
+  --ch6-dim: rgba(114,255,184,0.12);
+  --ch7-dim: rgba(255,228,114,0.12);
+  --ch8-dim: rgba(114,255,184,0.12);
+
+  /* ── Shadows (Dark) ── */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.6);
+  --shadow-glow-gold: 0 0 24px rgba(215,255,115,0.15);
+
+  --particle-opacity: 0.20;
+}

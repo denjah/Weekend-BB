@@ -1,0 +1,8 @@
+DirectoryIndex index.html
+
+<IfModule mod_headers.c>
+    # Разрешаем загрузку во фрейме для Битрикс24
+    Header always unset X-Frame-Options
+    # Заголовки CORS на всякий случай
+    Header set Access-Control-Allow-Origin "*"
+</IfModule>

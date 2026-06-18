@@ -1928,7 +1928,3 @@ a:hover {
 .section-particles-iframe {
   opacity: var(--particle-opacity, 0.28) !important;
 }
-
-#page-dashboard iframe[src*="background particles"] {
-  opacity: var(--particle-opacity, 0.28) !important;
-}
