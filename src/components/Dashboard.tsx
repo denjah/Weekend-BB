@@ -88,28 +88,28 @@ export const Dashboard = () => {
                     <span className="text-sm font-medium text-text-secondary">Визуальная система</span>
                     <span className="text-sm font-bold text-text-tertiary">0%</span>
                   </div>
-                  <ProgressBar progress={0} size="md" />
+                  <ProgressBar progress={0} />
                 </div>
                 <div>
                   <div className="flex justify-between mb-2">
                     <span className="text-sm font-medium text-text-secondary">Деловая документация</span>
                     <span className="text-sm font-bold text-text-tertiary">0%</span>
                   </div>
-                  <ProgressBar progress={0} size="md" />
+                  <ProgressBar progress={0} />
                 </div>
                 <div>
                   <div className="flex justify-between mb-2">
                     <span className="text-sm font-medium text-text-secondary">Маркетинговые материалы</span>
                     <span className="text-sm font-bold text-text-tertiary">0%</span>
                   </div>
-                  <ProgressBar progress={0} size="md" />
+                  <ProgressBar progress={0} />
                 </div>
               </div>
             </div>
 
             <div className="bg-bg-secondary border border-border-subtle rounded-xl p-8 flex flex-col items-center justify-center">
               <h3 className="text-lg font-bold mb-6 text-text-primary w-full">Общая готовность</h3>
-              <PieChart percentage={0} size={160} strokeWidth={12} color="var(--text-tertiary)" />
+              <PieChart percentage={0} size={160} strokeWidth={12} colorClass="text-text-tertiary" />
               <div className="mt-6 flex items-center gap-6 w-full justify-center">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-text-primary">0 / 84</div>

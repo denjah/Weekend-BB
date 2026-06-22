@@ -1,6 +1,6 @@
 // Mock Upload API
 export const uploadApi = {
-  uploadFile: async (file: File, sectionId: string): Promise<{ url: string; name: string }> => {
+  uploadFile: async (file: File, _sectionId: string): Promise<{ url: string; name: string }> => {
     // Simulating file upload network delay
     return new Promise((resolve) => {
       setTimeout(() => {

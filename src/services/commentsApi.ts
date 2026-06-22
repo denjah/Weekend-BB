@@ -23,7 +23,7 @@ export const commentsApi = {
     });
   },
 
-  addComment: async (sectionId: string, text: string, author: string = "User"): Promise<Comment> => {
+  addComment: async (_sectionId: string, text: string, author: string = "User"): Promise<Comment> => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({

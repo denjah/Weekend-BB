@@ -92,7 +92,7 @@ export const LogobookViewer = () => {
                         }} 
                       />
                     </label>
-                    {hasFile && (
+                    {hasFile && data.file && (
                       <span className="text-xs text-text-primary bg-bg-tertiary px-2 py-1 rounded truncate max-w-[120px]" title={data.file.name}>
                         {data.file.name}
                       </span>
