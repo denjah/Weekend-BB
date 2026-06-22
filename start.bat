@@ -1,0 +1,3 @@
+@echo off
+echo Starting Weekend Billiard Brandbook...
+npm run dev

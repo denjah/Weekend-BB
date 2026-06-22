@@ -1,0 +1,12 @@
+/* Import Tailwind tokens configuration */
+@import "./styles/tokens.css";
+
+/* Import themes */
+@import "./styles/themes/ethereal-glass.css";
+@import "./styles/themes/editorial-luxury.css";
+@import "./styles/themes/soft-structuralism.css";
+
+/* Import global resets */
+@import "./styles/global.css";
+
+/* Fallback is now handled in ethereal-glass.css */

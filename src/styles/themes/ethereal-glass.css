@@ -1,0 +1,29 @@
+/* Theme A: Ethereal Glass (Default) */
+:root, [data-theme="ethereal-glass"] {
+  --th-bg-primary: #050505;
+  --th-bg-secondary: #111111;
+  --th-bg-tertiary: #1A1A1A;
+  
+  --th-text-primary: #FFFFFF;
+  --th-text-secondary: #A3A3A3;
+  --th-text-tertiary: rgba(255, 255, 255, 0.4);
+  --th-text-inverse: #050505;
+
+  --th-accent-primary: #FF5E00;
+  --th-accent-hover: #CC4B00;
+  --th-border-subtle: rgba(255, 255, 255, 0.1);
+
+  --th-font-heading: 'Geist', 'Inter', sans-serif;
+  --th-font-body: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --th-font-mono: 'JetBrains Mono', monospace;
+
+  /* Chapter colors */
+  --th-ch1: #E0E0E0;
+  --th-ch2: #B3B3B3;
+  --th-ch3: #FFFFFF;
+  --th-ch4: #666666;
+  --th-ch5: #808080;
+  --th-ch6: #4D4D4D;
+  --th-ch7: #333333;
+  --th-ch8: #999999;
+}

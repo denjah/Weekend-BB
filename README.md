@@ -1,0 +1,42 @@
+# Weekend Billiard Corporate Brandbook
+
+Современный, производительный и интерактивный корпоративный брендбук, переписанный на стеке **React 19 + Vite + TypeScript**.
+
+## Особенности
+- **3 Уникальные Темы Дизайна**: Переключайтесь между Ethereal Glass, Editorial Luxury и Soft Structuralism. Дизайн-система основана на CSS-переменных, которые мгновенно меняются без перезагрузки страницы.
+- **GSAP Анимации**: Интерактивные фоновые частицы (Canvas-based), staggered появление карточек, Magnetic Buttons (магнитные кнопки) и плавные Scroll Reveal эффекты.
+- **Модульная Архитектура**: Каждая глава брендбука — это отдельная страница (lazy loading). Компоненты UI (Card, Badge, ProgressBar) переиспользуются по всему проекту.
+- **Legacy Данные**: Старый архив страниц (logobook) бережно перенесен в `logobook.json` и рендерится с помощью специального компонента `LogobookViewer.tsx`.
+- **Zustand State**: Глобальное управление темами и состоянием интерфейса.
+- **Vibe-coding Ready**: Минималистичный и чистый код, строгая типизация TypeScript.
+
+## Стек технологий
+- **Core**: React 19, TypeScript, Vite
+- **Routing**: React Router v7
+- **State**: Zustand
+- **Animations**: GSAP (`@gsap/react`), Canvas Particles
+- **Styling**: Tailwind CSS, Vanilla CSS (`tokens.css`, `global.css`)
+
+## Запуск проекта
+
+Убедитесь, что у вас установлен Node.js (v18+).
+
+```bash
+# Установка зависимостей
+npm install
+
+# Запуск dev-сервера (с HMR)
+npm run dev
+
+# Сборка для production
+npm run build
+```
+
+## Структура папок
+- `src/components/` — UI-компоненты, секции, эффекты (GSAP).
+- `src/styles/` — Дизайн-система, темы и токены.
+- `src/store/` — Zustand store (App + Brand данные).
+- `src/types/` — TS-интерфейсы.
+- `src/data/` — JSON архивы.
+- `src/services/` — Mock API.
+- `v1-vanilla/` — Старая версия проекта (архив).

@@ -1,0 +1,29 @@
+/* Theme B: Editorial Luxury */
+[data-theme="editorial-luxury"] {
+  --th-bg-primary: #FDFBF7;
+  --th-bg-secondary: #F4EFEB;
+  --th-bg-tertiary: #EBE5E0;
+  
+  --th-text-primary: #1B2B5A;
+  --th-text-secondary: #4A5568;
+  --th-text-tertiary: rgba(27, 43, 90, 0.5);
+  --th-text-inverse: #FDFBF7;
+
+  --th-accent-primary: #D4AF37;
+  --th-accent-hover: #C5A017;
+  --th-border-subtle: rgba(27, 43, 90, 0.1);
+
+  --th-font-heading: 'PP Editorial New', 'Playfair Display', serif;
+  --th-font-body: 'Söhne', 'Inter', sans-serif;
+  --th-font-mono: 'JetBrains Mono', monospace;
+
+  /* Chapter colors adapted for light theme */
+  --th-ch1: #A0AEC0;
+  --th-ch2: #718096;
+  --th-ch3: #1B2B5A;
+  --th-ch4: #4A5568;
+  --th-ch5: #2D3748;
+  --th-ch6: #EDF2F7;
+  --th-ch7: #E2E8F0;
+  --th-ch8: #CBD5E0;
+}

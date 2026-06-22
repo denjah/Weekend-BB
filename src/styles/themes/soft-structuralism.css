@@ -1,0 +1,29 @@
+/* Theme C: Soft Structuralism */
+[data-theme="soft-structuralism"] {
+  --th-bg-primary: #F5F5F7;
+  --th-bg-secondary: #FFFFFF;
+  --th-bg-tertiary: #E8E8ED;
+  
+  --th-text-primary: #1D1D1F;
+  --th-text-secondary: #86868B;
+  --th-text-tertiary: rgba(29, 29, 31, 0.4);
+  --th-text-inverse: #FFFFFF;
+
+  --th-accent-primary: #0066CC;
+  --th-accent-hover: #0055B3;
+  --th-border-subtle: rgba(0, 0, 0, 0.08);
+
+  --th-font-heading: 'Clash Display', 'Inter', sans-serif;
+  --th-font-body: 'Satoshi', 'Inter', sans-serif;
+  --th-font-mono: 'JetBrains Mono', monospace;
+
+  /* Chapter colors */
+  --th-ch1: #D1D5DB;
+  --th-ch2: #9CA3AF;
+  --th-ch3: #111827;
+  --th-ch4: #6B7280;
+  --th-ch5: #4B5563;
+  --th-ch6: #F3F4F6;
+  --th-ch7: #E5E7EB;
+  --th-ch8: #374151;
+}

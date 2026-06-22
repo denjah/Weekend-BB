@@ -1,0 +1,27 @@
+/* Global utilities and resets */
+
+@layer base {
+  body {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-family: var(--font-body);
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@layer utilities {
+  .shadow-coin {
+    box-shadow: 0px 4px 0px 0px var(--color-accent-primary);
+  }
+  .shadow-coin-active:active {
+    transform: translateY(2px);
+    box-shadow: 0px 2px 0px 0px var(--color-accent-primary);
+  }
+  .shadow-spring:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 8px 24px -4px rgba(0, 0, 0, 0.5);
+  }
+}

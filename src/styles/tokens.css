@@ -1,0 +1,30 @@
+/* Tailwind config mapping via @theme and CSS variables */
+@import "tailwindcss";
+
+@theme {
+  --color-bg-primary: var(--th-bg-primary);
+  --color-bg-secondary: var(--th-bg-secondary);
+  --color-bg-tertiary: var(--th-bg-tertiary);
+  
+  --color-text-primary: var(--th-text-primary);
+  --color-text-secondary: var(--th-text-secondary);
+  --color-text-tertiary: var(--th-text-tertiary);
+  --color-text-inverse: var(--th-text-inverse);
+
+  --color-accent-primary: var(--th-accent-primary);
+  --color-accent-hover: var(--th-accent-hover);
+  --color-border-subtle: var(--th-border-subtle);
+
+  --font-heading: var(--th-font-heading);
+  --font-body: var(--th-font-body);
+  --font-mono: var(--th-font-mono);
+
+  --color-ch1: var(--th-ch1);
+  --color-ch2: var(--th-ch2);
+  --color-ch3: var(--th-ch3);
+  --color-ch4: var(--th-ch4);
+  --color-ch5: var(--th-ch5);
+  --color-ch6: var(--th-ch6);
+  --color-ch7: var(--th-ch7);
+  --color-ch8: var(--th-ch8);
+}
