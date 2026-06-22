@@ -1,5 +1,5 @@
 import { SubsectionBlock } from "../brand/SubsectionBlock";
-import { PlaceholderBlock } from "../brand/PlaceholderBlock";
+import { SectionContent } from "../brand/SectionContent";
 
 export const VisualSystem = () => {
   return (
@@ -13,22 +13,22 @@ export const VisualSystem = () => {
 
       <div className="space-y-24">
         <SubsectionBlock title="2.1 Цветовая палитра" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Загрузите описание базовых и акцентных цветов." />
+          <SectionContent sectionId="visual-colors" title="Ожидаются материалы" description="Загрузите описание базовых и акцентных цветов." />
         </SubsectionBlock>
         <SubsectionBlock title="2.2 Типографика" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Загрузите шрифтовые файлы и правила использования." />
+          <SectionContent sectionId="visual-typography" title="Ожидаются материалы" description="Загрузите шрифтовые файлы и правила использования." />
         </SubsectionBlock>
         <SubsectionBlock title="2.3 Иконография" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Загрузите набор фирменных иконок (SVG)." />
+          <SectionContent sectionId="visual-iconography" title="Ожидаются материалы" description="Загрузите набор фирменных иконок (SVG)." />
         </SubsectionBlock>
         <SubsectionBlock title="2.4 Фотостиль" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Референсы и гайдлайны по подбору фотографий." />
+          <SectionContent sectionId="visual-photography" title="Ожидаются материалы" description="Референсы и гайдлайны по подбору фотографий." />
         </SubsectionBlock>
         <SubsectionBlock title="2.5 Паттерны и текстуры" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Фирменные графические элементы и фоны." />
+          <SectionContent sectionId="visual-patterns" title="Ожидаются материалы" description="Фирменные графические элементы и фоны." />
         </SubsectionBlock>
         <SubsectionBlock title="2.6 Сетка и композиция" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Принципы верстки и отступов." />
+          <SectionContent sectionId="visual-grid" title="Ожидаются материалы" description="Принципы верстки и отступов." />
         </SubsectionBlock>
       </div>
     </div>

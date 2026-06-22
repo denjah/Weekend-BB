@@ -1,5 +1,6 @@
 import { useAppStore } from '../store/useAppStore';
 import { Breadcrumbs } from './Breadcrumbs';
+import { ThemeSwitcher } from './ThemeSwitcher';
 
 export const Header = () => {
   const { searchQuery, setSearchQuery } = useAppStore();
@@ -25,10 +26,7 @@ export const Header = () => {
         </div>
         
         <div className="flex items-center gap-2 border-l border-border-subtle pl-6">
-          <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-bg-secondary text-text-tertiary hover:text-text-primary transition-colors">
-            {/* Dark mode toggle placeholder */}
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-          </button>
+          <ThemeSwitcher />
         </div>
       </div>
     </header>

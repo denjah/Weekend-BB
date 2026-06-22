@@ -1,5 +1,5 @@
 import { SubsectionBlock } from "../brand/SubsectionBlock";
-import { PlaceholderBlock } from "../brand/PlaceholderBlock";
+import { SectionContent } from "../brand/SectionContent";
 
 export const Digital = () => {
   return (
@@ -13,13 +13,13 @@ export const Digital = () => {
 
       <div className="space-y-24">
         <SubsectionBlock title="6.1 UI Kit и веб-дизайн" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Кнопки, инпуты, карточки и состояния элементов." />
+          <SectionContent sectionId="digital-ui-kit" title="Ожидаются материалы" description="Кнопки, инпуты, карточки и состояния элементов." />
         </SubsectionBlock>
         <SubsectionBlock title="6.2 Email рассылки" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Шаблоны писем." />
+          <SectionContent sectionId="digital-emails" title="Ожидаются материалы" description="Шаблоны писем." />
         </SubsectionBlock>
         <SubsectionBlock title="6.3 Подписи для email" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Корпоративные подписи сотрудников." />
+          <SectionContent sectionId="digital-signatures" title="Ожидаются материалы" description="Корпоративные подписи сотрудников." />
         </SubsectionBlock>
       </div>
     </div>

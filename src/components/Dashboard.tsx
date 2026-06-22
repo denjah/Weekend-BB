@@ -1,7 +1,9 @@
+import { useEffect } from "react";
 import { ChapterCard } from "./brand/ChapterCard";
 import { ScrollReveal } from "./effects/ScrollReveal";
 import { ProgressBar } from "./ui/ProgressBar";
 import { PieChart } from "./ui/PieChart";
+import { useBrandStore } from "../store/useBrandStore";
 const chapters = [
   { id: "brand-identity", num: "01", icon: "◆", title: "Brand Identity", desc: "Миссия, ценности, позиционирование, tone of voice, архетип бренда", count: "6 подразделов", color: "var(--color-ch1)" },
   { id: "visual-system", num: "02", icon: "◐", title: "Visual System", desc: "Цвета, типографика, иконография, фотостиль, паттерны, сетка", count: "6 подразделов", color: "var(--color-ch2)" },
@@ -14,6 +16,12 @@ const chapters = [
 ];
 
 export const Dashboard = () => {
+
+  const { stats, refreshStats } = useBrandStore();
+
+  useEffect(() => {
+    refreshStats();
+  }, []);
 
   return (
     <div className="min-h-screen relative overflow-hidden pb-32">
@@ -112,11 +120,11 @@ export const Dashboard = () => {
               <PieChart percentage={0} size={160} strokeWidth={12} colorClass="text-text-tertiary" />
               <div className="mt-6 flex items-center gap-6 w-full justify-center">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-text-primary">0 / 84</div>
-                  <div className="text-xs text-text-tertiary">Страниц</div>
+                  <div className="text-2xl font-bold text-text-primary">{stats?.totalComments || 0}</div>
+                  <div className="text-xs text-text-tertiary">Комментов</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-text-primary">0</div>
+                  <div className="text-2xl font-bold text-text-primary">{stats?.totalFiles || 0}</div>
                   <div className="text-xs text-text-tertiary">Файлов</div>
                 </div>
               </div>

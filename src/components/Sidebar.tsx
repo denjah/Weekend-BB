@@ -1,6 +1,5 @@
 import { NavLink } from "react-router-dom";
 import { Logo } from "./Logo";
-import { ThemeSwitcher } from "./ThemeSwitcher";
 
 const sections = [
   { id: "brand-identity", num: "1", title: "Brand Identity", dotColor: "bg-[#E0E0E0]" },
@@ -64,7 +63,6 @@ export const Sidebar = () => {
       </div>
 
       <div className="p-4 border-t border-border-subtle flex flex-col gap-4">
-        <ThemeSwitcher />
         <div className="text-xs text-text-tertiary font-mono px-2">
           v1.0 · Июнь 2026
         </div>

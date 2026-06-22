@@ -1,5 +1,5 @@
 import { SubsectionBlock } from "../brand/SubsectionBlock";
-import { PlaceholderBlock } from "../brand/PlaceholderBlock";
+import { SectionContent } from "../brand/SectionContent";
 import { LogobookViewer } from "../brand/LogobookViewer";
 
 export const LogoUsage = () => {
@@ -14,16 +14,16 @@ export const LogoUsage = () => {
 
       <div className="space-y-24">
         <SubsectionBlock title="3.1 Основная версия логотипа" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Загрузите файлы основной версии логотипа." />
+          <SectionContent sectionId="logo-main" title="Ожидаются материалы" description="Загрузите файлы основной версии логотипа." />
         </SubsectionBlock>
         <SubsectionBlock title="3.2 Монохромная и инверсная версии" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Загрузите ч/б версии." />
+          <SectionContent sectionId="logo-monochrome" title="Ожидаются материалы" description="Загрузите ч/б версии." />
         </SubsectionBlock>
         <SubsectionBlock title="3.3 Охранное поле" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Гайдлайны по минимальным отступам." />
+          <SectionContent sectionId="logo-clearspace" title="Ожидаются материалы" description="Гайдлайны по минимальным отступам." />
         </SubsectionBlock>
         <SubsectionBlock title="3.4 Недопустимое использование" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Примеры того, как нельзя использовать логотип." />
+          <SectionContent sectionId="logo-misuse" title="Ожидаются материалы" description="Примеры того, как нельзя использовать логотип." />
         </SubsectionBlock>
       </div>
 

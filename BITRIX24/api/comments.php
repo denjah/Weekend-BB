@@ -1,12 +1,17 @@
 <?php
 header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
 
-// В будущем здесь будет проверка Битрикс авторизации:
-// require_once $_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/include/prolog_before.php';
-// if (!$USER->IsAuthorized()) { die(json_encode(['status'=>'error', 'message'=>'Unauthorized'])); }
+// Обработка preflight запроса
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
 
-$dataFile = 'data/comments.json';
-if (!is_dir('data')) mkdir('data', 0755, true);
+$dataFile = __DIR__ . '/data/comments.json';
+if (!is_dir(__DIR__ . '/data')) mkdir(__DIR__ . '/data', 0755, true);
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $sectionId = isset($_GET['section_id']) ? $_GET['section_id'] : null;
@@ -42,9 +47,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $newComment = [
         'id' => uniqid('c_'),
         'section_id' => $input['section_id'],
+        'author' => isset($input['author']) ? htmlspecialchars($input['author']) : 'Пользователь',
         'text' => htmlspecialchars($input['text']),
         'timestamp' => time(),
-        'user' => isset($input['user_name']) ? htmlspecialchars($input['user_name']) : 'Арт-директор (Bitrix Mock)'
     ];
     
     $comments[] = $newComment;
@@ -53,3 +58,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode(['status' => 'success', 'data' => $newComment]);
     exit;
 }
+

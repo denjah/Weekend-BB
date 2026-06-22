@@ -1,5 +1,5 @@
 import { SubsectionBlock } from "../brand/SubsectionBlock";
-import { PlaceholderBlock } from "../brand/PlaceholderBlock";
+import { SectionContent } from "../brand/SectionContent";
 
 export const Corporate = () => {
   return (
@@ -13,16 +13,16 @@ export const Corporate = () => {
 
       <div className="space-y-24">
         <SubsectionBlock title="5.1 Визитные карточки" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Макеты корпоративных и персональных визиток." />
+          <SectionContent sectionId="corporate-business-cards" title="Ожидаются материалы" description="Макеты корпоративных и персональных визиток." />
         </SubsectionBlock>
         <SubsectionBlock title="5.2 Фирменные бланки" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Шаблоны документов (Word/PDF)." />
+          <SectionContent sectionId="corporate-letterheads" title="Ожидаются материалы" description="Шаблоны документов (Word/PDF)." />
         </SubsectionBlock>
         <SubsectionBlock title="5.3 Конверты и папки" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Макеты печатной продукции." />
+          <SectionContent sectionId="corporate-envelopes" title="Ожидаются материалы" description="Макеты печатной продукции." />
         </SubsectionBlock>
         <SubsectionBlock title="5.4 Шаблоны презентаций" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="PowerPoint и Keynote шаблоны." />
+          <SectionContent sectionId="corporate-presentations" title="Ожидаются материалы" description="PowerPoint и Keynote шаблоны." />
         </SubsectionBlock>
       </div>
     </div>

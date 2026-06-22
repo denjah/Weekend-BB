@@ -1,5 +1,5 @@
 import { SubsectionBlock } from "../brand/SubsectionBlock";
-import { PlaceholderBlock } from "../brand/PlaceholderBlock";
+import { SectionContent } from "../brand/SectionContent";
 
 export const Resources = () => {
   return (
@@ -13,13 +13,13 @@ export const Resources = () => {
 
       <div className="space-y-24">
         <SubsectionBlock title="8.1 Архивы логотипов" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Векторные (SVG, EPS, AI) и растровые (PNG, JPG) файлы." />
+          <SectionContent sectionId="resources-logos" title="Ожидаются материалы" description="Векторные (SVG, EPS, AI) и растровые (PNG, JPG) файлы." />
         </SubsectionBlock>
         <SubsectionBlock title="8.2 Архивы шрифтов" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="OTF/TTF и веб-шрифты (WOFF2)." />
+          <SectionContent sectionId="resources-fonts" title="Ожидаются материалы" description="OTF/TTF и веб-шрифты (WOFF2)." />
         </SubsectionBlock>
         <SubsectionBlock title="8.3 Шаблоны (Templates)" status="pending">
-          <PlaceholderBlock title="Ожидаются материалы" description="Файлы InDesign, Figma, Illustrator." />
+          <SectionContent sectionId="resources-templates" title="Ожидаются материалы" description="Файлы InDesign, Figma, Illustrator." />
         </SubsectionBlock>
       </div>
     </div>
