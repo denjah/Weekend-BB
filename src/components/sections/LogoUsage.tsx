@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { SubsectionBlock } from "../brand/SubsectionBlock";
-import { SectionContent } from "../brand/SectionContent";
 import { LogobookViewer } from "../brand/LogobookViewer";
 import logobookData from "../../data/logobook.json";
+
 
 export const LogoUsage = () => {
   const [activeSection, setActiveSection] = useState(logobookData[0].id);
