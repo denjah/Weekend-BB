@@ -1,34 +1,17 @@
 import { useState } from "react";
 import logobookData from "../../data/logobook.json";
 
-export const LogobookViewer = () => {
-  const [activeSection, setActiveSection] = useState(logobookData[0].id);
+interface LogobookViewerProps {
+  activeSection: string;
+}
+
+export const LogobookViewer = ({ activeSection }: LogobookViewerProps) => {
   const [cardData, setCardData] = useState<Record<string, { comment: string, file: File | null }>>({});
 
   const section = logobookData.find(s => s.id === activeSection) || logobookData[0];
 
   return (
-    <div className="mt-16 border-t border-border-subtle pt-16">
-      <div className="mb-12">
-        <h2 className="text-3xl font-bold text-text-primary mb-4">Архив Legacy-слайдов</h2>
-      </div>
-
-      <div className="flex flex-wrap gap-3 mb-8">
-        {logobookData.map((sec: any) => (
-          <button
-            key={sec.id}
-            onClick={() => setActiveSection(sec.id)}
-            className={`px-4 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-colors ${
-              activeSection === sec.id 
-                ? "bg-accent-primary text-bg-primary" 
-                : "bg-bg-secondary text-text-secondary hover:text-text-primary border border-border-subtle"
-            }`}
-          >
-            {sec.index}: {sec.title}
-          </button>
-        ))}
-      </div>
-
+    <div className="mt-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {section.cards.map((card: any, i: number) => {
           // Делаем некоторые карточки двойными для динамики (например, каждую 5-ю и некоторые другие)
@@ -48,9 +31,6 @@ export const LogobookViewer = () => {
               }`}
             >
               <div className="aspect-[4/3] bg-black/40 p-6 flex flex-col justify-center items-center text-center relative">
-                <div className="text-xs font-mono text-text-tertiary uppercase absolute top-4 left-4">
-                  {card.number}
-                </div>
                 <p className="text-sm text-text-secondary max-w-[80%] opacity-60 group-hover:opacity-100 transition-opacity">
                   {card.visual.desc}
                 </p>

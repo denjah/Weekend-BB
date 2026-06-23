@@ -59,6 +59,54 @@ export const BrandIdentity = () => {
             description="Загрузите гайд по тональности текстов." 
           />
         </SubsectionBlock>
+
+        <SubsectionBlock 
+          title="1.5 Основная версия логотипа" 
+          description="Загрузите файлы основной версии логотипа."
+          status="pending"
+        >
+          <SectionContent 
+            sectionId="logo-main" 
+            title="Ожидаются материалы" 
+            description="Загрузите файлы основной версии логотипа." 
+          />
+        </SubsectionBlock>
+
+        <SubsectionBlock 
+          title="1.6 Монохромная и инверсная версии" 
+          description="Загрузите ч/б версии."
+          status="pending"
+        >
+          <SectionContent 
+            sectionId="logo-monochrome" 
+            title="Ожидаются материалы" 
+            description="Загрузите ч/б версии." 
+          />
+        </SubsectionBlock>
+
+        <SubsectionBlock 
+          title="1.7 Охранное поле" 
+          description="Гайдлайны по минимальным отступам."
+          status="pending"
+        >
+          <SectionContent 
+            sectionId="logo-clearspace" 
+            title="Ожидаются материалы" 
+            description="Гайдлайны по минимальным отступам." 
+          />
+        </SubsectionBlock>
+
+        <SubsectionBlock 
+          title="1.8 Недопустимое использование" 
+          description="Примеры того, как нельзя использовать логотип."
+          status="pending"
+        >
+          <SectionContent 
+            sectionId="logo-misuse" 
+            title="Ожидаются материалы" 
+            description="Примеры того, как нельзя использовать логотип." 
+          />
+        </SubsectionBlock>
       </div>
     </div>
   );
