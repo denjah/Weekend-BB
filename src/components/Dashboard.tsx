@@ -4,7 +4,9 @@ import { ScrollReveal } from "./effects/ScrollReveal";
 import { ProgressBar } from "./ui/ProgressBar";
 import { PieChart } from "./ui/PieChart";
 import { useBrandStore } from "../store/useBrandStore";
-import heroBg from "../../IMAGES/weekend_viveska.jpg";
+import { useAppStore } from "../store/useAppStore";
+import heroBgDark from "../../IMAGES/weekend_viveska.jpg";
+import heroBgLight from "../../IMAGES/weekend_viveska_day.png";
 const chapters = [
   { id: "brand-identity", num: "01", icon: "◆", title: "Brand Identity", desc: "Миссия, ценности, позиционирование, tone of voice, архетип бренда", count: "6 подразделов", color: "var(--color-ch1)" },
   { id: "visual-system", num: "02", icon: "◐", title: "Visual System", desc: "Цвета, типографика, иконография, фотостиль, паттерны, сетка", count: "6 подразделов", color: "var(--color-ch2)" },
@@ -17,12 +19,15 @@ const chapters = [
 ];
 
 export const Dashboard = () => {
-
+  const { designTheme } = useAppStore();
   const { stats, refreshStats } = useBrandStore();
 
   useEffect(() => {
     refreshStats();
   }, []);
+
+  const isDark = designTheme === 'ethereal-glass';
+  const heroBg = isDark ? heroBgDark : heroBgLight;
 
   return (
     <div className="min-h-screen relative overflow-hidden pb-32">
@@ -32,7 +37,7 @@ export const Dashboard = () => {
         <ScrollReveal className="relative w-full" direction="down" distance={30}>
           <img src={heroBg} alt="Brandbook Hero" className="w-full h-auto block" />
           
-          <div className="absolute inset-0 bg-gradient-to-t from-bg-primary/40 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-bg-primary via-bg-primary/60 to-transparent pointer-events-none" />
 
           <div className="absolute top-8 left-8 md:left-16 z-20">
             <div className="inline-block px-3 py-1 rounded-sm bg-black/50 text-accent-primary text-xs font-mono uppercase tracking-widest border border-white/10 backdrop-blur-md shadow-sm">
